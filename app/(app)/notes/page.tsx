@@ -23,10 +23,7 @@ interface Note {
 
 export default function NotesBundlesPage() {
   const router = useRouter();
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCreateBundleOpen, setIsCreateBundleOpen] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Form states for new bundle
   const [bundleName, setBundleName] = useState('');
@@ -149,38 +146,35 @@ export default function NotesBundlesPage() {
     setIsCreateBundleOpen(false);
   };
 
-  const handleAddNote = () => {
-    setIsTransitioning(true);
-    setTimeout(async () => {
-      const newNoteId = 'note-' + Date.now();
-      const newNote = {
-        id: newNoteId,
-        title: 'Untitled',
-        content: '',
-        bundleId: selectedBundleId || 'unsorted',
-        updatedAt: new Date().toISOString().split('T')[0],
-        gridSpan: Math.random() > 0.5 ? 'col-span-2 row-span-1' : 'col-span-1 row-span-1',
-      };
+  const handleAddNote = async () => {
+    const newNoteId = 'note-' + Date.now();
+    const newNote = {
+      id: newNoteId,
+      title: 'Untitled',
+      content: '',
+      bundleId: selectedBundleId || 'unsorted',
+      updatedAt: new Date().toISOString().split('T')[0],
+      gridSpan: Math.random() > 0.5 ? 'col-span-2 row-span-1' : 'col-span-1 row-span-1',
+    };
 
-      const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+    const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
 
-      if (isGuest) {
-        const updatedNotes = [...notes, newNote];
-        setNotes(updatedNotes);
-        localStorage.setItem('draft_notes', JSON.stringify(updatedNotes));
-      } else {
-        const supabase = createClient();
-        await supabase.from('notes').insert({
-          id: newNote.id,
-          title: newNote.title,
-          content: newNote.content,
-          bundle_id: newNote.bundleId,
-          grid_span: newNote.gridSpan,
-        });
-      }
+    if (isGuest) {
+      const updatedNotes = [...notes, newNote];
+      setNotes(updatedNotes);
+      localStorage.setItem('draft_notes', JSON.stringify(updatedNotes));
+    } else {
+      const supabase = createClient();
+      await supabase.from('notes').insert({
+        id: newNote.id,
+        title: newNote.title,
+        content: newNote.content,
+        bundle_id: newNote.bundleId,
+        grid_span: newNote.gridSpan,
+      });
+    }
 
-      router.push(`/notes/editor/${newNoteId}`);
-    }, 350);
+    router.push(`/notes/editor/${newNoteId}`);
   };
 
   const handleLogout = async () => {
@@ -197,86 +191,70 @@ export default function NotesBundlesPage() {
     : notes;
 
   return (
-    <div className={`flex flex-col min-h-screen bg-[var(--color-surface)] py-8 px-12 md:px-24 w-full relative select-none transition-all duration-500 ease-in-out ${isTransitioning ? 'scale-[0.97] opacity-0 blur-sm' : 'scale-100 opacity-100'}`}>
+    <div className={`flex flex-col min-h-screen bg-[var(--color-surface)] py-8 px-12 md:px-24 w-full relative select-none`}>
       
       {/* HEADER */}
-      <div className="flex justify-between items-center z-30 w-full">
-        {/* Left Filter Text Button */}
-        <button 
-          onClick={() => {
-            setIsFilterOpen(!isFilterOpen);
-            setIsSettingsOpen(false);
-          }}
-          className={`font-degraded not-italic text-lg md:text-xl tracking-wider uppercase transition-colors duration-150 ${isFilterOpen ? 'text-[var(--color-rust)]' : 'text-[var(--color-ink)]'} hover:opacity-75`}
-        >
-          filter
-        </button>
+      <div className="flex justify-between items-start z-40 w-full relative">
+        {/* Left Filter Dropdown */}
+        <details className="group relative">
+          <summary className="list-none cursor-pointer font-degraded not-italic text-lg md:text-xl tracking-wider uppercase text-[var(--color-ink)] hover:opacity-75">
+            filter
+          </summary>
+          <div className="absolute left-0 top-10 w-64 bg-[var(--color-surface)] border border-[var(--color-ink)] shadow-md p-5 animate-in fade-in slide-in-from-top-4 duration-200">
+            <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
+              <button
+                onClick={() => setSelectedBundleId(null)}
+                className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider ${!selectedBundleId ? 'bg-[var(--color-ink)] text-[var(--color-surface)]' : 'hover:bg-[var(--color-input-bg)] text-[var(--color-ink)]'}`}
+              >
+                <span className="italic">A</span>LL N<span className="italic">O</span>TES
+              </button>
+              {bundles.map(b => (
+                <button
+                  key={b.id}
+                  onClick={() => setSelectedBundleId(b.id)}
+                  className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider flex items-center space-x-2 ${selectedBundleId === b.id ? 'bg-[var(--color-ink)] text-[var(--color-surface)]' : 'hover:bg-[var(--color-input-bg)] text-[var(--color-ink)]'}`}
+                >
+                  <span className="w-2.5 h-2.5 shrink-0" style={{ backgroundColor: b.color }} />
+                  <span className="truncate">{b.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </details>
 
         {/* Center Title */}
-        <h1 className="text-6xl md:text-7xl text-[var(--color-rust)] font-degraded italic tracking-tight">
+        <h1 className="text-6xl md:text-7xl text-[var(--color-rust)] font-degraded italic tracking-tight leading-none mt-[-8px]">
           notes
         </h1>
 
-        {/* Right Menu Text Button */}
-        <button 
-          onClick={() => {
-            setIsSettingsOpen(!isSettingsOpen);
-            setIsFilterOpen(false);
-          }}
-          className={`font-degraded not-italic text-lg md:text-xl tracking-wider uppercase transition-colors duration-150 ${isSettingsOpen ? 'text-[var(--color-rust)]' : 'text-[var(--color-ink)]'} hover:opacity-75`}
-        >
-          menu
-        </button>
-      </div>
-
-      {/* DROPDOWN MENU: BUNDLE FILTER (Left Side) */}
-      {isFilterOpen && (
-        <div className="absolute left-12 top-24 w-64 bg-[var(--color-surface)] border border-[var(--color-ink)] shadow-md z-40 p-5 animate-in fade-in slide-in-from-top-4 duration-200">
-          <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
-            <button
-              onClick={() => { setSelectedBundleId(null); setIsFilterOpen(false); }}
-              className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider ${!selectedBundleId ? 'bg-[var(--color-ink)] text-[var(--color-surface)]' : 'hover:bg-[var(--color-input-bg)] text-[var(--color-ink)]'}`}
-            >
-              <span className="italic">A</span>LL N<span className="italic">O</span>TES
-            </button>
-            {bundles.map(b => (
-              <button
-                key={b.id}
-                onClick={() => { setSelectedBundleId(b.id); setIsFilterOpen(false); }}
-                className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider flex items-center space-x-2 ${selectedBundleId === b.id ? 'bg-[var(--color-ink)] text-[var(--color-surface)]' : 'hover:bg-[var(--color-input-bg)] text-[var(--color-ink)]'}`}
+        {/* Right Menu Dropdown */}
+        <details className="group relative">
+          <summary className="list-none cursor-pointer font-degraded not-italic text-lg md:text-xl tracking-wider uppercase text-[var(--color-ink)] hover:opacity-75">
+            menu
+          </summary>
+          <div className="absolute right-0 top-10 w-64 bg-[var(--color-surface)] border border-[var(--color-ink)] shadow-md p-5 animate-in fade-in slide-in-from-top-4 duration-200">
+            <div className="flex flex-col space-y-4">
+              <Link
+                href="/dashboard"
+                className="font-degraded not-italic text-sm tracking-wider text-[var(--color-ink)] hover:text-[var(--color-rust)] hover:underline block"
               >
-                <span className="w-2.5 h-2.5 shrink-0" style={{ backgroundColor: b.color }} />
-                <span className="truncate">{b.name}</span>
+                B<span className="italic">A</span>CK TO D<span className="italic">A</span>SHBOARD
+              </Link>
+              <button
+                onClick={() => setIsCreateBundleOpen(true)}
+                className="w-full text-left font-degraded not-italic text-sm tracking-wider text-[var(--color-ink)] hover:text-[var(--color-rust)] hover:underline block"
+              >
+                CRE<span className="italic">A</span>TE NEW B<span className="italic">U</span>NDLE
               </button>
-            ))}
+              <button
+                className="w-full text-left font-degraded not-italic text-sm tracking-wider text-[var(--color-ink)] hover:text-[var(--color-rust)] hover:underline block"
+              >
+                EXP<span className="italic">O</span>RT <span className="italic">A</span>LL N<span className="italic">O</span>TES
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* DROPDOWN MENU: NOTES SETTINGS (Right Side) */}
-      {isSettingsOpen && (
-        <div className="absolute right-12 top-24 w-64 bg-[var(--color-surface)] border border-[var(--color-ink)] shadow-md z-40 p-5 animate-in fade-in slide-in-from-top-4 duration-200">
-          <div className="flex flex-col space-y-4">
-            <Link
-              href="/dashboard"
-              className="font-degraded not-italic text-sm tracking-wider text-[var(--color-ink)] hover:text-[var(--color-rust)] hover:underline block"
-            >
-              B<span className="italic">A</span>CK TO D<span className="italic">A</span>SHBOARD
-            </Link>
-            <button
-              onClick={() => { setIsCreateBundleOpen(true); setIsSettingsOpen(false); }}
-              className="w-full text-left font-degraded not-italic text-sm tracking-wider text-[var(--color-ink)] hover:text-[var(--color-rust)] hover:underline block"
-            >
-              CRE<span className="italic">A</span>TE NEW B<span className="italic">U</span>NDLE
-            </button>
-            <button
-              className="w-full text-left font-degraded not-italic text-sm tracking-wider text-[var(--color-ink)] hover:text-[var(--color-rust)] hover:underline block"
-            >
-              EXP<span className="italic">O</span>RT <span className="italic">A</span>LL N<span className="italic">O</span>TES
-            </button>
-          </div>
-        </div>
-      )}
+        </details>
+      </div>
 
       {/* BENTO GRID OF NOTES */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full">

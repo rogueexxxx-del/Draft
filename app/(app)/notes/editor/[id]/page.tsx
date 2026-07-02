@@ -323,27 +323,17 @@ export default function EditorPage({ params }: { params: { id: string } }) {
     setShowMenu(false);
     if (!pageRef.current) return;
     try {
-      // Temporarily hide elements to prevent them from showing up in the screenshot
-      const noPrintElements = document.querySelectorAll('.no-print');
-      noPrintElements.forEach((el: any) => {
-        el.style.visibility = 'hidden';
-      });
-
       const dataUrl = await toJpeg(pageRef.current, {
         quality: 0.98,
-        skipFonts: true, // Prevents custom relative stylesheet font loading failures
+        skipFonts: true,
+        filter: (node) => !node.classList?.contains('no-print'),
         // @ts-expect-error styleSheetFilter is not in Options type but works at runtime
-        styleSheetFilter: () => false, // Skips stylesheet fetching to avoid relative font errors
+        styleSheetFilter: () => false,
         style: {
-          backgroundAttachment: 'scroll', // fixes background fixed rendering bugs in html-to-image
+          backgroundAttachment: 'scroll',
           backgroundBlendMode: themeBgImage ? themeBlendMode : 'normal',
           filter: themeBgImage ? getFilterStyle() : 'none',
         }
-      });
-
-      // Restore elements visibility after capture
-      noPrintElements.forEach((el: any) => {
-        el.style.visibility = 'visible';
       });
 
       const link = document.createElement('a');
