@@ -93,10 +93,9 @@ export default function LoginPage() {
           {error && <div className="text-red-600 glass-panel p-3 text-sm">{error}</div>}
           <button 
             type="submit" 
-            disabled={loading}
-            className="w-full p-4 glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity"
+            className="w-full p-4 glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity"
           >
-            {loading ? 'AUTH3NTIC4TING...' : 'L0GIN'}
+            L0GIN
           </button>
         </form>
 
