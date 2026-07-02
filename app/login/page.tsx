@@ -72,15 +72,14 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* FORM */}
-        <form onSubmit={handleLogin} className="w-full flex flex-col space-y-4">
+        <form onSubmit={handleLogin} className="w-full flex flex-col space-y-4 max-w-sm">
           <input 
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="E-M4IL"
             required
-            className="w-full p-4 glass-panel text-[var(--color-ink)] focus:outline-none placeholder:text-[var(--color-muted)] placeholder:italic text-lg outline-none"
+            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-[var(--color-ink)] focus:outline-none placeholder:text-center placeholder:text-[var(--color-muted)]/60 placeholder:text-xs outline-none"
           />
           <input 
             type="password"
@@ -88,12 +87,12 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="P4SSW0RD"
             required
-            className="w-full p-4 glass-panel text-[var(--color-ink)] focus:outline-none placeholder:text-[var(--color-muted)] placeholder:italic text-lg outline-none"
+            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-[var(--color-ink)] focus:outline-none placeholder:text-center placeholder:text-[var(--color-muted)]/60 placeholder:text-xs outline-none"
           />
-          {error && <div className="text-red-600 glass-panel p-3 text-sm">{error}</div>}
+          {error && <div className="text-red-600 glass-panel px-3 py-1.5 text-xs text-center rounded-full">{error}</div>}
           <button 
             type="submit" 
-            className="w-full p-4 glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity"
+            className="w-full h-[35px] rounded-full glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity text-xs"
           >
             L0GIN
           </button>

@@ -244,7 +244,7 @@ export default function ShaderCanvas({ panel = 0, theme = 'light', opacity = 1.0
   return (
     <canvas 
       ref={canvasRef} 
-      style={{ opacity, filter: 'blur(60px)' }}
+      style={{ opacity, filter: 'blur(30px)' }}
       className="fixed inset-0 w-full h-full z-0 pointer-events-none select-none no-print scale-125 transform-gpu"
     />
   );

@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { Star } from 'lucide-react';
+import { BentoCardGrid, GlobalSpotlight, ParticleCard } from '@/components/MagicBento';
 
 interface Bundle {
   id: string;
@@ -37,11 +38,20 @@ export default function NotesBundlesPage() {
   const [selectedBundleId, setSelectedBundleId] = useState<string | null>(null);
   const [starredBundles, setStarredBundles] = useState<string[]>([]);
 
+  const gridRef = useRef<HTMLDivElement>(null);
+
   const hexToRgba = (hex: string, alpha: number) => {
     const r = parseInt(hex.slice(1, 3), 16) || 255;
     const g = parseInt(hex.slice(3, 5), 16) || 255;
     const b = parseInt(hex.slice(5, 7), 16) || 255;
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
+  const hexToRgbString = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16) || 255;
+    const g = parseInt(hex.slice(3, 5), 16) || 255;
+    const b = parseInt(hex.slice(5, 7), 16) || 255;
+    return `${r}, ${g}, ${b}`;
   };
 
   // Initialize data on mount
@@ -277,13 +287,19 @@ export default function NotesBundlesPage() {
       </div>
 
       {/* BENTO GRID OF NOTES */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full z-20">
+      <BentoCardGrid gridRef={gridRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full z-20">
+        <GlobalSpotlight
+          gridRef={gridRef}
+          glowColor={selectedBundleId ? hexToRgbString(bundles.find(b => b.id === selectedBundleId)?.color || '#D9D9D9') : '132, 0, 255'}
+          spotlightRadius={300}
+        />
         {filteredNotes.map((note) => {
           const bundle = bundles.find(b => b.id === note.bundleId);
           const blockColor = bundle?.color || '#D9D9D9';
           
           // Make the background color transparent glass (0.75 opacity for rich color, but letting backing show)
           const glassColor = hexToRgba(blockColor, 0.75);
+          const rgbColorString = hexToRgbString(blockColor);
 
           // Reverse text color logic for clear bento grid display
           const isDarkBg = blockColor === '#141414' || blockColor === '#DD400A';
@@ -295,16 +311,20 @@ export default function NotesBundlesPage() {
             : 'empty note...';
 
           return (
-            <Link
+            <ParticleCard
               key={note.id}
-              href={`/notes/editor/${note.id}`}
-              className={`p-8 flex flex-col justify-between transition-all duration-200 hover:scale-[1.01] glass-panel-color ${note.gridSpan || 'col-span-1 row-span-1'}`}
-              style={{ backgroundColor: glassColor }}
+              glowColor={rgbColorString}
+              className={`p-8 flex flex-col justify-between transition-all duration-200 hover:scale-[1.01] magic-bento-card magic-bento-card--border-glow ${note.gridSpan || 'col-span-1 row-span-1'}`}
+              style={{ backgroundColor: glassColor, '--glow-color': rgbColorString } as any}
+              onClick={() => router.push(`/notes/editor/${note.id}`)}
+              enableTilt={true}
+              clickEffect={true}
+              enableMagnetism={true}
             >
-              <span className={`text-xs font-sans tracking-widest uppercase ${descColor}`}>
+              <span className={`text-xs font-sans tracking-widest uppercase ${descColor} z-10`}>
                 {bundle?.name || 'unsorted'}
               </span>
-              <div className="mt-6 flex-grow flex flex-col justify-end">
+              <div className="mt-6 flex-grow flex flex-col justify-end z-10">
                 <h3 className={`text-2xl font-serif not-italic font-normal ${textColor} truncate`}>
                   {note.title}
                 </h3>
@@ -312,10 +332,10 @@ export default function NotesBundlesPage() {
                   {cleanTextPreview}
                 </p>
               </div>
-            </Link>
+            </ParticleCard>
           );
         })}
-      </div>
+      </BentoCardGrid>
 
       {/* FLOATING ACTION: ADD NOTE */}
       <div className="flex justify-center pt-12 pb-6 z-30">
@@ -339,13 +359,13 @@ export default function NotesBundlesPage() {
                 value={bundleName}
                 onChange={(e) => setBundleName(e.target.value)}
                 required
-                className="w-full p-3 glass-panel-dark text-white focus:outline-none placeholder:text-white/50 placeholder:italic text-sm"
+                className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel-dark text-white focus:outline-none placeholder:text-center placeholder:text-white/50 placeholder:text-xs outline-none"
               />
               <textarea 
                 placeholder="Description (Optional)"
                 value={bundleDesc}
                 onChange={(e) => setBundleDesc(e.target.value)}
-                className="w-full p-3 glass-panel-dark text-white focus:outline-none placeholder:text-white/50 placeholder:italic text-sm h-24 resize-none"
+                className="w-full px-4 py-2 rounded-2xl text-center text-xs font-normal glass-panel-dark text-white focus:outline-none placeholder:text-center placeholder:text-white/50 placeholder:text-xs h-20 resize-none outline-none"
               />
               <div className="flex flex-col space-y-2">
                 <span className="text-xs uppercase tracking-widest opacity-80">Color Tag</span>
