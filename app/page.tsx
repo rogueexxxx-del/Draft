@@ -10,8 +10,31 @@ export default function WelcomePage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    const checkSession = async () => {
+      setMounted(true);
+      
+      let isGuest = false;
+      try {
+        isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+      } catch (e) {}
+
+      if (isGuest) {
+        router.push('/dashboard');
+        return;
+      }
+
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          router.push('/dashboard');
+        }
+      } catch (err) {
+        console.warn("Auto-redirect check failed:", err);
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const handleLetsGo = async () => {
     try {

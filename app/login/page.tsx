@@ -24,6 +24,10 @@ export default function LoginPage() {
     if (error) {
       setError(error.message);
     } else {
+      try {
+        localStorage.setItem('draft_user_email', email);
+      } catch (e) {}
+
       // Clear guest mode if they log in to a real account with real Supabase configurations
       if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
         document.cookie = "draft_guest_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";

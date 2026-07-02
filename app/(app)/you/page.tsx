@@ -13,11 +13,20 @@ export default function YouPage() {
     const fetchUser = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
+      
+      let localEmail = '';
+      try {
+        localEmail = localStorage.getItem('draft_user_email') || '';
+      } catch (e) {}
+
       if (user) {
-        setEmail(user.email?.toUpperCase() ?? 'GUEST@DRAFT.COM');
+        if (user.id === 'guest-mock' && localEmail) {
+          setEmail(localEmail.toUpperCase());
+        } else {
+          setEmail(user.email?.toUpperCase() ?? 'GUEST@DRAFT.COM');
+        }
       } else {
-        const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
-        setEmail(isGuest ? 'GUEST@DRAFT.COM' : 'GUEST@DRAFT.COM');
+        setEmail(localEmail ? localEmail.toUpperCase() : 'GUEST@DRAFT.COM');
       }
     };
     fetchUser();
@@ -27,7 +36,10 @@ export default function YouPage() {
     const supabase = createClient();
     await supabase.auth.signOut();
     document.cookie = "draft_guest_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    localStorage.removeItem("draft_guest_mode");
+    try {
+      localStorage.removeItem("draft_guest_mode");
+      localStorage.removeItem("draft_user_email");
+    } catch (e) {}
     router.push('/login');
   };
 
