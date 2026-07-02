@@ -55,16 +55,16 @@ export default function ShaderCanvas({ panel = 0, theme = 'light', opacity = 1.0
       float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
       mat2 rot(float a) { float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
 
-      // 1. Metaballs
+      // 1. Soft Blurry Metaballs (Aura Blob Style)
       vec3 renderPanel1(vec2 uv) {
           vec2 p = uv * 2.0 - 1.0;
           float d = 0.0;
-          for(float i=0.0; i<5.0; i++) {
-              vec2 pos = 0.5 * vec2(sin(u_time*0.7+i*1.2), cos(u_time*0.5+i*0.8));
-              d += 0.08 / length(p - pos);
+          for(float i=0.0; i<4.0; i++) {
+              vec2 pos = 0.6 * vec2(sin(u_time*0.4+i*1.5), cos(u_time*0.3+i*0.9));
+              d += 0.18 / (length(p - pos) + 0.15);
           }
-          float m = smoothstep(0.48, 0.5, d);
-          return mix(u_bgColor, u_lineColor, m * 0.45);
+          float m = clamp(d * 0.38, 0.0, 1.0);
+          return mix(u_bgColor, u_lineColor, m * 0.5);
       }
 
       // 2. Fractal Terrain
