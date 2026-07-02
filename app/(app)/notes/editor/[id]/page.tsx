@@ -12,6 +12,7 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { MoreHorizontal, Plus, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toJpeg } from 'html-to-image';
+import { createClient } from '@/utils/supabase/client';
 
 // --- SLASH COMMAND EXTENSION ---
 const CommandList = forwardRef((props: any, ref) => {
@@ -200,8 +201,100 @@ export default function EditorPage({ params }: { params: { id: string } }) {
     },
   });
 
-  const handleSave = () => {
-    alert('Note saved explicitly!');
+  // Load Note data on mount / editor initialization
+  useEffect(() => {
+    const loadNote = async () => {
+      if (!editor) return;
+
+      const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+
+      if (isGuest) {
+        const localNotes = localStorage.getItem('draft_notes');
+        if (localNotes) {
+          const notesList = JSON.parse(localNotes);
+          const currentNote = notesList.find((n: any) => n.id === params.id);
+          if (currentNote) {
+            setTitle(currentNote.title || '');
+            setDescription(currentNote.description || '');
+            editor.commands.setContent(currentNote.content || '');
+            
+            // Populate theme if present
+            if (currentNote.theme_settings) {
+              setThemeBgColor(currentNote.theme_settings.themeBgColor || '#FFFFFF');
+              setThemeBgImage(currentNote.theme_settings.themeBgImage || null);
+              setThemeBlendMode(currentNote.theme_settings.themeBlendMode || 'multiply');
+              setThemeBgSaturation(currentNote.theme_settings.themeBgSaturation || 'muted');
+            }
+          }
+        }
+      } else {
+        const supabase = createClient();
+        const { data: note, error } = await supabase
+          .from('notes')
+          .select('*')
+          .eq('id', params.id)
+          .single();
+
+        if (note && !error) {
+          setTitle(note.title || '');
+          setDescription(note.description || '');
+          editor.commands.setContent(note.content || '');
+          
+          if (note.theme_settings) {
+            setThemeBgColor(note.theme_settings.themeBgColor || '#FFFFFF');
+            setThemeBgImage(note.theme_settings.themeBgImage || null);
+            setThemeBlendMode(note.theme_settings.themeBlendMode || 'multiply');
+            setThemeBgSaturation(note.theme_settings.themeBgSaturation || 'muted');
+          }
+        }
+      }
+    };
+
+    loadNote();
+  }, [params.id, editor]);
+
+  const handleSave = async () => {
+    const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+    const contentHtml = editor?.getHTML() || '';
+    const themeSettings = {
+      themeBgColor,
+      themeBgImage,
+      themeBlendMode,
+      themeBgSaturation,
+    };
+
+    if (isGuest) {
+      const localNotes = localStorage.getItem('draft_notes');
+      if (localNotes) {
+        const notesList = JSON.parse(localNotes);
+        const updated = notesList.map((n: any) => 
+          n.id === params.id 
+            ? { 
+                ...n, 
+                title, 
+                description, 
+                content: contentHtml, 
+                theme_settings: themeSettings,
+                updatedAt: new Date().toISOString().split('T')[0] 
+              } 
+            : n
+        );
+        localStorage.setItem('draft_notes', JSON.stringify(updated));
+      }
+    } else {
+      const supabase = createClient();
+      await supabase
+        .from('notes')
+        .update({
+          title,
+          description,
+          content: contentHtml,
+          theme_settings: themeSettings,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', params.id);
+    }
+    alert('Note saved successfully!');
   };
 
   // Convert uploaded image file to Base64 to prevent canvas taints and HTML-to-Image crashes
@@ -259,6 +352,31 @@ export default function EditorPage({ params }: { params: { id: string } }) {
     } catch (error) {
       console.error('Oops, something went wrong with JPG export!', error);
     }
+  };
+
+  const handleExportMD = () => {
+    setShowMenu(false);
+    const contentHtml = editor?.getHTML() || '';
+    
+    // Convert basic HTML to standard Markdown format
+    const cleanMarkdown = contentHtml
+      .replace(/<h1>(.*?)<\/h1>/g, '# $1\n\n')
+      .replace(/<h2>(.*?)<\/h2>/g, '## $1\n\n')
+      .replace(/<p>(.*?)<\/p>/g, '$1\n\n')
+      .replace(/<li>(.*?)<\/li>/g, '- $1\n')
+      .replace(/<ul>/g, '')
+      .replace(/<\/ul>/g, '\n')
+      .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
+      .replace(/<em>(.*?)<\/em>/g, '*$1*')
+      .replace(/<br\s*\/?>/g, '\n')
+      .replace(/<[^>]*>/g, ''); // strip remaining tags
+    
+    const fullMD = `# ${title || 'Untitled Note'}\n${description ? `> ${description}\n\n` : ''}${cleanMarkdown}`;
+    const blob = new Blob([fullMD], { type: 'text/markdown;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title || 'Untitled Note'}.md`;
+    link.click();
   };
 
   // Derive dynamic styles based on theme background color to ensure full adaptation
@@ -348,53 +466,54 @@ export default function EditorPage({ params }: { params: { id: string } }) {
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Add description..."
-            className={`w-full text-center bg-transparent border-none outline-none text-lg md:text-xl mt-4 bg-none focus:ring-0 ${mutedTextColor} ${isDarkTheme ? 'placeholder:text-white/30' : 'placeholder:text-black/20'}`}
+            placeholder="ADD DESCRIPTION"
+            className={`w-full text-center bg-transparent border-none outline-none text-lg mt-2 uppercase tracking-wide focus:ring-0 font-serif ${mutedTextColor} ${placeholderColor}`}
           />
-          
-          {/* Three dots settings menu on right */}
+
+          {/* Settings Hamburger Button on Right */}
           <div className="absolute right-0 top-3 no-print">
             <button 
-              onClick={() => setShowMenu(!showMenu)}
-              className={`p-1 hover:opacity-75 transition-opacity ${textColor}`}
+              onClick={() => setShowMenu(!showMenu)} 
+              className={`hover:opacity-75 transition-opacity ${textColor}`}
             >
               <MoreHorizontal size={28} strokeWidth={1.5} />
             </button>
-            
+
+            {/* SETTINGS PANEL DROPDOWN */}
             {showMenu && (
-              <div className={`absolute right-0 mt-2 w-64 shadow-md z-50 flex flex-col p-5 space-y-4 border ${dropdownBg}`}>
+              <div className={`absolute right-0 top-10 w-72 p-5 border shadow-xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 ${dropdownBg}`}>
                 
-                {/* THEME SETTINGS (FIRST) */}
-                <div className="flex flex-col space-y-3">
-                  <span className="font-degraded italic text-sm tracking-wider uppercase">THEME SETTINGS</span>
+                {/* THEME CONFIGURATORS (FIRST) */}
+                <div className="flex flex-col space-y-4">
+                  <span className="font-degraded italic text-sm tracking-wider uppercase">NOTE THEME</span>
                   
-                  {/* Bg Colors selection */}
-                  <div className="flex flex-col space-y-1.5">
-                    <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>bg color</span>
-                    <div className="flex space-x-2 pt-1">
-                      {[
-                        { name: 'white', hex: '#FFFFFF' },
-                        { name: 'rust', hex: '#DD400A' },
-                        { name: 'ink', hex: '#141414' },
-                        { name: 'grey', hex: '#D9D9D9' }
-                      ].map((c) => (
+                  {/* Color presets selection */}
+                  <div className="flex flex-col space-y-2">
+                    <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>background fill</span>
+                    <div className="flex space-x-3">
+                      {['#FFFFFF', '#141414', '#DD400A'].map((color) => (
                         <button
-                          key={c.hex}
-                          onClick={() => { setThemeBgColor(c.hex); }}
-                          className={`w-7 h-7 border transition-all ${themeBgColor === c.hex ? (isDarkTheme ? 'border-white scale-110' : 'border-black scale-110') : 'border-transparent'}`}
-                          style={{ backgroundColor: c.hex }}
-                          title={c.name}
+                          key={color}
+                          type="button"
+                          onClick={() => setThemeBgColor(color)}
+                          className={`w-8 h-8 transition-transform border ${
+                            themeBgColor === color 
+                              ? isDarkTheme ? 'border-white scale-110' : 'border-black scale-110' 
+                              : 'border-transparent hover:scale-105'
+                          }`}
+                          style={{ backgroundColor: color }}
                         />
                       ))}
                     </div>
                   </div>
 
-                  {/* Upload Background Image */}
-                  <div className="flex flex-col space-y-1.5">
-                    <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>bg image</span>
-                    <div className="flex items-center space-x-3 pt-1">
-                      <label className="cursor-pointer font-degraded not-italic text-xs underline hover:text-[var(--color-rust)] block">
-                        {themeBgImage ? 'CHANGE IMAGE' : 'UPLOAD IMAGE'}
+                  {/* Local Background image upload */}
+                  <div className="flex flex-col space-y-2">
+                    <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>background image</span>
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center justify-center p-2.5 border border-dashed border-current hover:opacity-75 transition-opacity cursor-pointer">
+                        <Plus size={16} className="mr-1" />
+                        <span className="font-degraded not-italic text-[10px] uppercase tracking-wider">UPLOAD</span>
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -465,7 +584,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
                 <div className="flex flex-col space-y-3">
                   <span className="font-degraded italic text-sm tracking-wider uppercase">EXPORT SETTINGS</span>
                   <button 
-                    onClick={() => alert('Exporting MD...')}
+                    onClick={handleExportMD}
                     className="text-left font-degraded not-italic text-xs tracking-wider hover:underline block"
                   >
                     EXP<span className="italic">O</span>RT .MD

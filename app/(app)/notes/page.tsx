@@ -1,26 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Filter, Menu, Plus, X, FolderPlus, Download, Home, LogOut } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 
-type Bundle = {
+interface Bundle {
   id: string;
   name: string;
   description: string;
-  color: string; // hex color code
-};
+  color: string;
+}
 
-type Note = {
+interface Note {
   id: string;
   title: string;
   content: string;
   bundleId: string;
   updatedAt: string;
-  gridSpan?: string; // CSS grid classes for bento layout
-};
+  gridSpan?: string;
+}
 
 export default function NotesBundlesPage() {
   const router = useRouter();
@@ -34,45 +33,88 @@ export default function NotesBundlesPage() {
   const [bundleDesc, setBundleDesc] = useState('');
   const [bundleColor, setBundleColor] = useState('#DD400A'); // default rust
 
-  // State loaded from localStorage
+  // State loaded from localStorage or Supabase
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedBundleId, setSelectedBundleId] = useState<string | null>(null);
 
   // Initialize data on mount
   useEffect(() => {
-    const localBundles = localStorage.getItem('draft_bundles');
-    const localNotes = localStorage.getItem('draft_notes');
+    const loadData = async () => {
+      const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
 
-    const defaultBundles: Bundle[] = [
-      { id: 'unsorted', name: 'unsorted', description: 'default capture pool', color: '#D9D9D9' },
-      { id: 'feature-film', name: 'Feature Film', description: 'screenplay prep', color: '#DD400A' },
-      { id: 'journal', name: 'Journal', description: 'daily thoughts', color: '#141414' },
-    ];
+      const defaultBundles: Bundle[] = [
+        { id: 'unsorted', name: 'unsorted', description: 'default capture pool', color: '#D9D9D9' },
+        { id: 'feature-film', name: 'Feature Film', description: 'screenplay prep', color: '#DD400A' },
+        { id: 'journal', name: 'Journal', description: 'daily thoughts', color: '#141414' },
+      ];
 
-    const defaultNotes: Note[] = [
-      { id: 'note-1', title: 'Character Outline', content: 'Hero archetype definition...', bundleId: 'feature-film', updatedAt: '2026-07-02', gridSpan: 'col-span-2 row-span-1' },
-      { id: 'note-2', title: 'Act I Beats', content: 'Inciting incident at minute 10...', bundleId: 'feature-film', updatedAt: '2026-07-02', gridSpan: 'col-span-1 row-span-2' },
-      { id: 'note-3', title: 'Reflections', content: 'Writing early in the morning feels better...', bundleId: 'journal', updatedAt: '2026-07-01', gridSpan: 'col-span-2 row-span-1' },
-      { id: 'note-4', title: 'Fast Capture Note', content: 'A quick unstructured brain dump...', bundleId: 'unsorted', updatedAt: '2026-07-02', gridSpan: 'col-span-1 row-span-1' },
-    ];
+      const defaultNotes: Note[] = [
+        { id: 'note-1', title: 'Character Outline', content: 'Hero archetype definition...', bundleId: 'feature-film', updatedAt: '2026-07-02', gridSpan: 'col-span-2 row-span-1' },
+        { id: 'note-2', title: 'Act I Beats', content: 'Inciting incident at minute 10...', bundleId: 'feature-film', updatedAt: '2026-07-02', gridSpan: 'col-span-1 row-span-2' },
+        { id: 'note-3', title: 'Reflections', content: 'Writing early in the morning feels better...', bundleId: 'journal', updatedAt: '2026-07-01', gridSpan: 'col-span-2 row-span-1' },
+        { id: 'note-4', title: 'Fast Capture Note', content: 'A quick unstructured brain dump...', bundleId: 'unsorted', updatedAt: '2026-07-02', gridSpan: 'col-span-1 row-span-1' },
+      ];
 
-    if (localBundles) {
-      setBundles(JSON.parse(localBundles));
-    } else {
-      setBundles(defaultBundles);
-      localStorage.setItem('draft_bundles', JSON.stringify(defaultBundles));
-    }
+      if (isGuest) {
+        const localBundles = localStorage.getItem('draft_bundles');
+        const localNotes = localStorage.getItem('draft_notes');
 
-    if (localNotes) {
-      setNotes(JSON.parse(localNotes));
-    } else {
-      setNotes(defaultNotes);
-      localStorage.setItem('draft_notes', JSON.stringify(defaultNotes));
-    }
+        if (localBundles) {
+          setBundles(JSON.parse(localBundles));
+        } else {
+          setBundles(defaultBundles);
+          localStorage.setItem('draft_bundles', JSON.stringify(defaultBundles));
+        }
+
+        if (localNotes) {
+          setNotes(JSON.parse(localNotes));
+        } else {
+          setNotes(defaultNotes);
+          localStorage.setItem('draft_notes', JSON.stringify(defaultNotes));
+        }
+      } else {
+        const supabase = createClient();
+        
+        // Fetch Bundles
+        let { data: bundlesData } = await supabase.from('bundles').select('*');
+        if (!bundlesData || bundlesData.length === 0) {
+          await supabase.from('bundles').insert(defaultBundles);
+          setBundles(defaultBundles);
+        } else {
+          setBundles(bundlesData);
+        }
+
+        // Fetch Notes
+        let { data: notesData } = await supabase.from('notes').select('*');
+        if (!notesData || notesData.length === 0) {
+          const formattedDefaults = defaultNotes.map(n => ({
+            id: n.id,
+            title: n.title,
+            content: n.content,
+            bundle_id: n.bundleId,
+            grid_span: n.gridSpan,
+          }));
+          await supabase.from('notes').insert(formattedDefaults);
+          setNotes(defaultNotes);
+        } else {
+          const mappedNotes = notesData.map((n: any) => ({
+            id: n.id,
+            title: n.title,
+            content: n.content,
+            bundleId: n.bundle_id,
+            updatedAt: n.updated_at?.split('T')[0] || '',
+            gridSpan: n.grid_span,
+          }));
+          setNotes(mappedNotes);
+        }
+      }
+    };
+
+    loadData();
   }, []);
 
-  const handleCreateBundle = (e: React.FormEvent) => {
+  const handleCreateBundle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bundleName.trim()) return;
 
@@ -83,9 +125,22 @@ export default function NotesBundlesPage() {
       color: bundleColor,
     };
 
-    const updatedBundles = [...bundles, newBundle];
-    setBundles(updatedBundles);
-    localStorage.setItem('draft_bundles', JSON.stringify(updatedBundles));
+    const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+
+    if (isGuest) {
+      const updatedBundles = [...bundles, newBundle];
+      setBundles(updatedBundles);
+      localStorage.setItem('draft_bundles', JSON.stringify(updatedBundles));
+    } else {
+      const supabase = createClient();
+      await supabase.from('bundles').insert({
+        id: newBundle.id,
+        name: newBundle.name,
+        description: newBundle.description,
+        color: newBundle.color,
+      });
+      setBundles([...bundles, newBundle]);
+    }
 
     // Reset form
     setBundleName('');
@@ -96,10 +151,9 @@ export default function NotesBundlesPage() {
 
   const handleAddNote = () => {
     setIsTransitioning(true);
-    // Delay routing slightly to play the screen zoom/fade exit transition
-    setTimeout(() => {
+    setTimeout(async () => {
       const newNoteId = 'note-' + Date.now();
-      const newNote: Note = {
+      const newNote = {
         id: newNoteId,
         title: 'Untitled',
         content: '',
@@ -108,9 +162,22 @@ export default function NotesBundlesPage() {
         gridSpan: Math.random() > 0.5 ? 'col-span-2 row-span-1' : 'col-span-1 row-span-1',
       };
 
-      const updatedNotes = [...notes, newNote];
-      setNotes(updatedNotes);
-      localStorage.setItem('draft_notes', JSON.stringify(updatedNotes));
+      const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+
+      if (isGuest) {
+        const updatedNotes = [...notes, newNote];
+        setNotes(updatedNotes);
+        localStorage.setItem('draft_notes', JSON.stringify(updatedNotes));
+      } else {
+        const supabase = createClient();
+        await supabase.from('notes').insert({
+          id: newNote.id,
+          title: newNote.title,
+          content: newNote.content,
+          bundle_id: newNote.bundleId,
+          grid_span: newNote.gridSpan,
+        });
+      }
 
       router.push(`/notes/editor/${newNoteId}`);
     }, 350);
@@ -222,6 +289,11 @@ export default function NotesBundlesPage() {
           const textColor = isDarkBg ? 'text-[var(--color-surface)]' : 'text-[var(--color-ink)]';
           const descColor = isDarkBg ? 'text-[var(--color-surface)]/70' : 'text-[var(--color-muted)]';
 
+          // Render note body text preview, stripping html elements if synced from Editor
+          const cleanTextPreview = note.content
+            ? note.content.replace(/<[^>]*>/g, ' ').substring(0, 120)
+            : 'empty note...';
+
           return (
             <Link
               key={note.id}
@@ -238,7 +310,7 @@ export default function NotesBundlesPage() {
                   {note.title}
                 </h3>
                 <p className={`text-sm mt-2 line-clamp-3 font-serif ${descColor}`}>
-                  {note.content || 'empty note...'}
+                  {cleanTextPreview}
                 </p>
               </div>
             </Link>
@@ -256,78 +328,57 @@ export default function NotesBundlesPage() {
         </button>
       </div>
 
-      {/* POPUP MODAL: CREATE BUNDLE */}
+      {/* BUNDLE CREATION MODAL */}
       {isCreateBundleOpen && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <form 
-            onSubmit={handleCreateBundle}
-            className="w-full max-w-md bg-[var(--color-surface)] border border-[var(--color-ink)] p-8 flex flex-col space-y-6 animate-in zoom-in-95 duration-150"
-          >
-            <div className="flex justify-between items-center border-b border-[var(--color-input-bg)] pb-3">
-              <span className="font-serif italic text-2xl text-[var(--color-ink)]">New Bundle</span>
-              <button 
-                type="button"
-                onClick={() => setIsCreateBundleOpen(false)}
-                className="text-[var(--color-ink)] hover:opacity-75"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            {/* Input Name */}
-            <div className="flex flex-col space-y-2">
-              <input
+          <div className="bg-[var(--color-surface)] border border-[var(--color-ink)] p-8 max-w-md w-full relative">
+            <h3 className="font-degraded italic text-2xl mb-6">Create New Bundle</h3>
+            <form onSubmit={handleCreateBundle} className="flex flex-col space-y-4">
+              <input 
                 type="text"
                 placeholder="Bundle Name"
                 value={bundleName}
                 onChange={(e) => setBundleName(e.target.value)}
                 required
-                className="w-full p-4 bg-[var(--color-input-bg)] text-[var(--color-ink)] placeholder-[#808080] placeholder:not-italic focus:outline-none rounded-none text-base"
+                className="w-full p-3 bg-[var(--color-input-bg)] border-none text-[var(--color-ink)] focus:outline-none placeholder:text-[var(--color-muted)] placeholder:italic text-sm"
               />
-            </div>
-
-            {/* Input Description */}
-            <div className="flex flex-col space-y-2">
-              <input
-                type="text"
-                placeholder="Description"
+              <textarea 
+                placeholder="Description (Optional)"
                 value={bundleDesc}
                 onChange={(e) => setBundleDesc(e.target.value)}
-                className="w-full p-4 bg-[var(--color-input-bg)] text-[var(--color-ink)] placeholder-[#808080] placeholder:not-italic focus:outline-none rounded-none text-base"
+                className="w-full p-3 bg-[var(--color-input-bg)] border-none text-[var(--color-ink)] focus:outline-none placeholder:text-[var(--color-muted)] placeholder:italic text-sm h-24 resize-none"
               />
-            </div>
-
-            {/* Color Picker selection (figma palette) */}
-            <div className="flex flex-col space-y-2">
-              <label className="text-xs uppercase tracking-widest text-[var(--color-muted)] font-sans">Select Color</label>
-              <div className="flex space-x-3 pt-1">
-                {[
-                  { name: 'rust', hex: '#DD400A' },
-                  { name: 'ink', hex: '#141414' },
-                  { name: 'grey', hex: '#D9D9D9' },
-                  { name: 'deep blue', hex: '#236BE5' },
-                  { name: 'deep yellow', hex: '#E5A823' }
-                ].map((colorOpt) => (
-                  <button
-                    key={colorOpt.hex}
-                    type="button"
-                    onClick={() => setBundleColor(colorOpt.hex)}
-                    className={`w-10 h-10 border-2 transition-all ${bundleColor === colorOpt.hex ? 'border-[var(--color-ink)] scale-110' : 'border-transparent'}`}
-                    style={{ backgroundColor: colorOpt.hex }}
-                    title={colorOpt.name}
-                  />
-                ))}
+              <div className="flex flex-col space-y-2">
+                <span className="text-xs uppercase tracking-widest text-[var(--color-muted)]">Color Tag</span>
+                <div className="flex space-x-3">
+                  {['#DD400A', '#141414', '#D9D9D9', '#3B82F6', '#FBBF24'].map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setBundleColor(color)}
+                      className={`w-8 h-8 transition-transform ${bundleColor === color ? 'border-2 border-[var(--color-ink)] scale-110' : 'border border-transparent'}`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full py-4 mt-2 bg-[var(--color-ink)] text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity rounded-none text-base"
-            >
-              CREATE BUNDLE
-            </button>
-          </form>
+              <div className="flex justify-end space-x-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateBundleOpen(false)}
+                  className="font-degraded not-italic text-sm uppercase tracking-wider hover:underline"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="font-degraded font-bold text-sm uppercase tracking-wider text-[var(--color-rust)] hover:underline"
+                >
+                  Create
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
