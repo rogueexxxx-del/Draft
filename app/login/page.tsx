@@ -24,9 +24,14 @@ export default function LoginPage() {
     if (error) {
       setError(error.message);
     } else {
-      // Clear guest mode if they log in to a real account
-      document.cookie = "draft_guest_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      localStorage.removeItem("draft_guest_mode");
+      // Clear guest mode if they log in to a real account with real Supabase configurations
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+        document.cookie = "draft_guest_mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        localStorage.removeItem("draft_guest_mode");
+      } else {
+        document.cookie = "draft_guest_mode=true; path=/";
+        localStorage.setItem("draft_guest_mode", "true");
+      }
       router.push('/dashboard');
     }
   };

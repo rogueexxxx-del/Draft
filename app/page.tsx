@@ -14,18 +14,36 @@ export default function WelcomePage() {
   }, []);
 
   const handleLetsGo = async () => {
-    localStorage.setItem('draft_welcome_seen', 'true');
-    if (localStorage.getItem('draft_guest_mode') === 'true') {
+    try {
+      localStorage.setItem('draft_welcome_seen', 'true');
+    } catch (e) {
+      console.warn("Storage write failed:", e);
+    }
+
+    let isGuest = false;
+    try {
+      isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+    } catch (e) {
+      console.warn("Storage read failed:", e);
+    }
+
+    if (isGuest) {
       router.push('/dashboard');
       return;
     }
-    const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      router.push('/dashboard');
-    } else {
-      router.push('/signup');
+
+    try {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push('/dashboard');
+        return;
+      }
+    } catch (err) {
+      console.warn("Supabase auth check failed, defaulting to guest signup:", err);
     }
+
+    router.push('/signup');
   };
 
   if (!mounted) return null; // Avoid hydration mismatch
