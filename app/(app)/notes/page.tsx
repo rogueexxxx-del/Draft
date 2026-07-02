@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import SwipeableCard from '@/components/SwipeableCard';
 import { Star } from 'lucide-react';
 
 interface Bundle {
@@ -35,10 +34,9 @@ export default function NotesBundlesPage() {
   // State loaded from localStorage or Supabase
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [starredBundles, setStarredBundles] = useState<string[]>([]);
   const [selectedBundleId, setSelectedBundleId] = useState<string | null>(null);
+  const [starredBundles, setStarredBundles] = useState<string[]>([]);
 
-  // Convert hex color to rgba for glass tint
   const hexToRgba = (hex: string, alpha: number) => {
     const r = parseInt(hex.slice(1, 3), 16) || 255;
     const g = parseInt(hex.slice(3, 5), 16) || 255;
@@ -55,7 +53,7 @@ export default function NotesBundlesPage() {
       if (storedStars) setStarredBundles(JSON.parse(storedStars));
 
       const defaultBundles: Bundle[] = [
-        { id: 'unsorted', name: 'unsorted', description: 'default capture pool', color: '#FFFFFF' },
+        { id: 'unsorted', name: 'unsorted', description: 'default capture pool', color: '#D9D9D9' },
         { id: 'feature-film', name: 'Feature Film', description: 'screenplay prep', color: '#DD400A' },
         { id: 'journal', name: 'Journal', description: 'daily thoughts', color: '#141414' },
       ];
@@ -157,31 +155,6 @@ export default function NotesBundlesPage() {
     setIsCreateBundleOpen(false);
   };
 
-  const handleDeleteBundle = async (id: string) => {
-    if (id === 'unsorted') return; // protect default bundle
-    const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
-    if (isGuest) {
-      const updatedBundles = bundles.filter(b => b.id !== id);
-      setBundles(updatedBundles);
-      localStorage.setItem('draft_bundles', JSON.stringify(updatedBundles));
-      
-      // Move notes to unsorted
-      const updatedNotes = notes.map(n => n.bundleId === id ? { ...n, bundleId: 'unsorted' } : n);
-      setNotes(updatedNotes);
-      localStorage.setItem('draft_notes', JSON.stringify(updatedNotes));
-    } else {
-      const supabase = createClient();
-      await supabase.from('bundles').delete().eq('id', id);
-      setBundles(bundles.filter(b => b.id !== id));
-      
-      const updatedNotes = notes.map(n => n.bundleId === id ? { ...n, bundleId: 'unsorted' } : n);
-      setNotes(updatedNotes);
-      // Supabase CASCADE or trigger handles notes generally, but we'll assume manual move for safety here
-      await supabase.from('notes').update({ bundle_id: 'unsorted' }).eq('bundle_id', id);
-    }
-    if (selectedBundleId === id) setSelectedBundleId(null);
-  };
-
   const handleAddNote = async () => {
     const newNoteId = 'note-' + Date.now();
     const newNote = {
@@ -213,19 +186,6 @@ export default function NotesBundlesPage() {
     router.push(`/notes/editor/${newNoteId}`);
   };
 
-  const handleDeleteNote = async (id: string) => {
-    const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
-    if (isGuest) {
-      const updatedNotes = notes.filter(n => n.id !== id);
-      setNotes(updatedNotes);
-      localStorage.setItem('draft_notes', JSON.stringify(updatedNotes));
-    } else {
-      const supabase = createClient();
-      await supabase.from('notes').delete().eq('id', id);
-      setNotes(notes.filter(n => n.id !== id));
-    }
-  };
-
   const toggleStar = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const updated = starredBundles.includes(id)
@@ -235,25 +195,52 @@ export default function NotesBundlesPage() {
     localStorage.setItem('draft_starred_bundles', JSON.stringify(updated));
   };
 
-  // Sort bundles: Starred first
+  const filteredNotes = selectedBundleId
+    ? notes.filter(n => n.bundleId === selectedBundleId)
+    : notes;
+
+  // Sort bundles in filter dropdown (starred first)
   const sortedBundles = [...bundles].sort((a, b) => {
     const aStar = starredBundles.includes(a.id) ? 1 : 0;
     const bStar = starredBundles.includes(b.id) ? 1 : 0;
     return bStar - aStar;
   });
 
-  const filteredNotes = selectedBundleId
-    ? notes.filter(n => n.bundleId === selectedBundleId)
-    : notes;
-
   return (
     <div className={`flex flex-col min-h-screen bg-transparent py-8 px-12 md:px-24 w-full relative select-none text-[var(--color-ink)]`}>
       
       {/* HEADER */}
       <div className="flex justify-between items-start z-40 w-full relative">
-        <Link href="/dashboard" className="font-degraded not-italic text-lg md:text-xl tracking-wider uppercase hover:opacity-75">
-          D<span className="italic">A</span>SHBOARD
-        </Link>
+        {/* Left Filter Dropdown */}
+        <details className="group relative">
+          <summary className="list-none cursor-pointer font-degraded not-italic text-lg md:text-xl tracking-wider uppercase hover:opacity-75">
+            filter
+          </summary>
+          <div className="absolute left-0 top-10 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+            <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
+              <button
+                onClick={() => setSelectedBundleId(null)}
+                className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider ${!selectedBundleId ? 'bg-black/10 font-bold rounded-lg' : 'hover:bg-black/5 rounded-lg'}`}
+              >
+                <span className="italic">A</span>LL N<span className="italic">O</span>TES
+              </button>
+              {sortedBundles.map(b => (
+                <div key={b.id} className={`flex items-center justify-between hover:bg-black/5 rounded-lg px-3 py-1 ${selectedBundleId === b.id ? 'bg-black/10 font-bold' : ''}`}>
+                  <button
+                    onClick={() => setSelectedBundleId(b.id)}
+                    className="text-left py-1 font-degraded not-italic text-sm uppercase tracking-wider flex items-center space-x-2 flex-grow truncate"
+                  >
+                    <span className="w-2.5 h-2.5 shrink-0 rounded-full" style={{ backgroundColor: b.color }} />
+                    <span className="truncate">{b.name}</span>
+                  </button>
+                  <button onClick={(e) => toggleStar(b.id, e)} className="p-1 hover:scale-110 transition-transform">
+                    <Star size={14} className={starredBundles.includes(b.id) ? 'fill-current text-[var(--color-rust)]' : 'opacity-30'} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </details>
 
         {/* Center Title */}
         <h1 className="text-6xl md:text-7xl font-degraded italic tracking-tight leading-none mt-[-8px]">
@@ -265,8 +252,14 @@ export default function NotesBundlesPage() {
           <summary className="list-none cursor-pointer font-degraded not-italic text-lg md:text-xl tracking-wider uppercase hover:opacity-75">
             menu
           </summary>
-          <div className="absolute right-0 top-10 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200">
+          <div className="absolute right-0 top-10 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
             <div className="flex flex-col space-y-4">
+              <Link
+                href="/dashboard"
+                className="font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
+              >
+                B<span className="italic">A</span>CK TO D<span className="italic">A</span>SHBOARD
+              </Link>
               <button
                 onClick={() => setIsCreateBundleOpen(true)}
                 className="w-full text-left font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
@@ -283,76 +276,43 @@ export default function NotesBundlesPage() {
         </details>
       </div>
 
-      {/* BUNDLES SECTION */}
-      <div className="w-full mt-12 z-30">
-        <div className="flex items-center space-x-4 mb-4">
-          <h2 className="font-degraded not-italic text-sm uppercase tracking-widest opacity-80">Bundles</h2>
-          <button 
-            onClick={() => setSelectedBundleId(null)}
-            className={`font-degraded not-italic text-xs uppercase tracking-widest px-3 py-1 border transition-all ${!selectedBundleId ? 'bg-black text-white' : 'glass-panel hover:bg-black/10'}`}
-          >
-            All Notes
-          </button>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-          {sortedBundles.map((bundle) => {
-            const isStarred = starredBundles.includes(bundle.id);
-            const isSelected = selectedBundleId === bundle.id;
-            const glassColor = hexToRgba(bundle.color, 0.15);
-            return (
-              <div key={bundle.id} className="h-24">
-                <SwipeableCard 
-                  onDelete={() => handleDeleteBundle(bundle.id)}
-                  onClick={() => setSelectedBundleId(bundle.id)}
-                  className={`p-4 flex flex-col justify-between transition-all glass-panel-color ${isSelected ? 'border-2 scale-[1.02]' : 'hover:scale-[1.01]'}`}
-                  style={{ backgroundColor: glassColor, borderColor: isSelected ? bundle.color : 'rgba(255,255,255,0.2)' }}
-                >
-                  <div className="flex justify-between items-start">
-                    <span className="font-degraded uppercase text-sm tracking-widest truncate">{bundle.name}</span>
-                    <button onClick={(e) => toggleStar(bundle.id, e)} className="hover:scale-110 transition-transform">
-                      <Star size={16} className={isStarred ? 'fill-current' : 'opacity-30'} />
-                    </button>
-                  </div>
-                  <span className="font-serif text-xs opacity-60 truncate">{bundle.description}</span>
-                </SwipeableCard>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
       {/* BENTO GRID OF NOTES */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-12 flex-grow content-start w-full z-20">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full z-20">
         {filteredNotes.map((note) => {
           const bundle = bundles.find(b => b.id === note.bundleId);
-          const blockColor = bundle?.color || '#FFFFFF';
-          const glassColor = hexToRgba(blockColor, 0.15);
+          const blockColor = bundle?.color || '#D9D9D9';
           
+          // Make the background color transparent glass (0.75 opacity for rich color, but letting backing show)
+          const glassColor = hexToRgba(blockColor, 0.75);
+
+          // Reverse text color logic for clear bento grid display
+          const isDarkBg = blockColor === '#141414' || blockColor === '#DD400A';
+          const textColor = isDarkBg ? 'text-[var(--color-surface)]' : 'text-[var(--color-ink)]';
+          const descColor = isDarkBg ? 'text-[var(--color-surface)]/70' : 'text-[var(--color-muted)]';
+
           const cleanTextPreview = note.content
             ? note.content.replace(/<[^>]*>/g, ' ').substring(0, 120)
             : 'empty note...';
 
           return (
-            <div key={note.id} className={note.gridSpan || 'col-span-1 row-span-1 min-h-[200px]'}>
-              <SwipeableCard
-                onDelete={() => handleDeleteNote(note.id)}
-                onClick={() => router.push(`/notes/editor/${note.id}`)}
-                className="p-8 flex flex-col justify-between transition-transform duration-200 hover:scale-[1.01] glass-panel-color"
-                style={{ backgroundColor: glassColor }}
-              >
-                <span className="text-xs font-sans tracking-widest uppercase opacity-70">
-                  {bundle?.name || 'unsorted'}
-                </span>
-                <div className="mt-6 flex-grow flex flex-col justify-end">
-                  <h3 className="text-2xl font-serif not-italic font-normal truncate">
-                    {note.title}
-                  </h3>
-                  <p className="text-sm mt-2 line-clamp-3 font-serif opacity-70">
-                    {cleanTextPreview}
-                  </p>
-                </div>
-              </SwipeableCard>
-            </div>
+            <Link
+              key={note.id}
+              href={`/notes/editor/${note.id}`}
+              className={`p-8 flex flex-col justify-between transition-all duration-200 hover:scale-[1.01] glass-panel-color ${note.gridSpan || 'col-span-1 row-span-1'}`}
+              style={{ backgroundColor: glassColor }}
+            >
+              <span className={`text-xs font-sans tracking-widest uppercase ${descColor}`}>
+                {bundle?.name || 'unsorted'}
+              </span>
+              <div className="mt-6 flex-grow flex flex-col justify-end">
+                <h3 className={`text-2xl font-serif not-italic font-normal ${textColor} truncate`}>
+                  {note.title}
+                </h3>
+                <p className={`text-sm mt-2 line-clamp-3 font-serif ${descColor}`}>
+                  {cleanTextPreview}
+                </p>
+              </div>
+            </Link>
           );
         })}
       </div>
@@ -370,7 +330,7 @@ export default function NotesBundlesPage() {
       {/* BUNDLE CREATION MODAL */}
       {isCreateBundleOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-panel p-8 max-w-md w-full relative">
+          <div className="glass-panel p-8 max-w-md w-full relative text-[var(--color-ink)] animate-in zoom-in-95 duration-200">
             <h3 className="font-degraded italic text-2xl mb-6">Create New Bundle</h3>
             <form onSubmit={handleCreateBundle} className="flex flex-col space-y-4">
               <input 
@@ -390,12 +350,12 @@ export default function NotesBundlesPage() {
               <div className="flex flex-col space-y-2">
                 <span className="text-xs uppercase tracking-widest opacity-80">Color Tag</span>
                 <div className="flex space-x-3">
-                  {['#DD400A', '#141414', '#FFFFFF', '#3B82F6', '#FBBF24'].map((color) => (
+                  {['#DD400A', '#141414', '#D9D9D9', '#3B82F6', '#FBBF24'].map((color) => (
                     <button
                       key={color}
                       type="button"
                       onClick={() => setBundleColor(color)}
-                      className={`w-8 h-8 transition-transform ${bundleColor === color ? 'border-2 border-black scale-110' : 'border border-white/20'}`}
+                      className={`w-8 h-8 transition-transform rounded-full ${bundleColor === color ? 'border-2 border-black scale-110' : 'border border-white/20'}`}
                       style={{ backgroundColor: color }}
                     />
                   ))}

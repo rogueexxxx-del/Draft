@@ -13,6 +13,7 @@ import { MoreHorizontal, Plus, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toJpeg } from 'html-to-image';
 import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 
 // --- SLASH COMMAND EXTENSION ---
 const CommandList = forwardRef((props: any, ref) => {
@@ -128,6 +129,7 @@ const SlashCommands = Extension.create({
 
 // --- EDITOR COMPONENT ---
 export default function EditorPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [showMenu, setShowMenu] = useState(false);
@@ -295,6 +297,23 @@ export default function EditorPage({ params }: { params: { id: string } }) {
         .eq('id', params.id);
     }
     alert('Note saved successfully!');
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this note?')) return;
+    const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+    if (isGuest) {
+      const localNotes = localStorage.getItem('draft_notes');
+      if (localNotes) {
+        const notesList = JSON.parse(localNotes);
+        const updated = notesList.filter((n: any) => n.id !== params.id);
+        localStorage.setItem('draft_notes', JSON.stringify(updated));
+      }
+    } else {
+      const supabase = createClient();
+      await supabase.from('notes').delete().eq('id', params.id);
+    }
+    router.push('/notes');
   };
 
   // Convert uploaded image file to Base64 to prevent canvas taints and HTML-to-Image crashes
@@ -591,6 +610,13 @@ export default function EditorPage({ params }: { params: { id: string } }) {
                     className="text-left font-degraded not-italic text-xs tracking-wider hover:underline block"
                   >
                     EXP<span className="italic">O</span>RT .JPG
+                  </button>
+                  <hr className={`border ${dividerStyle}`} />
+                  <button 
+                    onClick={handleDelete}
+                    className="text-left font-degraded not-italic text-xs tracking-wider text-red-500 hover:underline block"
+                  >
+                    DELETE NOTE
                   </button>
                 </div>
 
