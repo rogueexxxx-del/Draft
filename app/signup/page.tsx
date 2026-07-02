@@ -65,8 +65,8 @@ export default function SignupPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-transparent select-none relative overflow-hidden">
-      {/* Generative WebGL crystal growth backdrop with Rust theme (panel 6) */}
-      <ShaderCanvas panel={6} theme="rust" opacity={1.0} />
+      {/* Generative WebGL crystal growth backdrop with Rust theme (panel 1) */}
+      <ShaderCanvas panel={1} theme="rust" opacity={1.0} />
 
       <div className="w-full max-w-lg flex flex-col items-center space-y-16 z-10">
         

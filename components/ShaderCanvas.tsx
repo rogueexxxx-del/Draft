@@ -60,104 +60,21 @@ export default function ShaderCanvas({ panel = 0, theme = 'light', opacity = 1.0
           vec2 p = uv * 2.0 - 1.0;
           float d = 0.0;
           for(float i=0.0; i<4.0; i++) {
-              vec2 pos = 0.6 * vec2(sin(u_time*0.4+i*1.5), cos(u_time*0.3+i*0.9));
-              d += 0.18 / (length(p - pos) + 0.15);
+              vec2 pos = 0.75 * vec2(sin(u_time * 0.18 + i * 1.5), cos(u_time * 0.15 + i * 0.9));
+              d += 0.38 / (length(p - pos) + 0.32);
           }
-          float m = clamp(d * 0.38, 0.0, 1.0);
-          return mix(u_bgColor, u_lineColor, m * 0.5);
-      }
-
-      // 2. Fractal Terrain
-      float noise(vec2 p) {
-          vec2 i = floor(p), f = fract(p);
-          f = f*f*(3.0-2.0*f);
-          return mix(mix(hash(i), hash(i+vec2(1,0)), f.x),
-                     mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
-      }
-      float fbm(vec2 p) {
-          float v = 0.0, a = 0.5;
-          for(int i=0; i<5; i++) { v += a * noise(p); p *= 2.0; a *= 0.5; }
-          return v;
-      }
-      vec3 renderPanel2(vec2 uv) {
-          vec2 p = uv * 10.0 + u_time * 0.2;
-          float h = fbm(p);
-          float grid = abs(fract(h * 10.0) - 0.5) / fwidth(h * 10.0);
-          return mix(u_bgColor, u_lineColor, (1.0 - smoothstep(0.0, 1.0, grid)) * 0.35);
-      }
-
-      // 3. Particle Flow
-      vec3 renderPanel3(vec2 uv) {
-          vec2 p = uv * 6.0;
-          vec3 col = u_bgColor;
-          for(float i=0.0; i<15.0; i++) {
-              float t = u_time * 0.5 + i * 0.5;
-              vec2 pos = vec2(fract(i * 0.23) * 6.0, mod(t, 6.0));
-              pos.x += sin(pos.y + u_time) * 0.5;
-              float d = length(p - pos);
-              col = mix(col, u_lineColor, smoothstep(0.08, 0.07, d) * 0.4);
-          }
-          return col;
-      }
-
-      // 4. Liquid Simulation (Refraction/Waves)
-      vec3 renderPanel4(vec2 uv) {
-          vec2 p = uv * 10.0;
-          float d = sin(p.x * 0.5 + u_time) + sin(p.y * 0.5 + u_time * 0.8);
-          vec2 dist = vec2(sin(d + u_time), cos(d + u_time)) * 0.1;
-          float lines = sin((uv.x + dist.x) * 40.0) * sin((uv.y + dist.y) * 40.0);
-          return mix(u_bgColor, u_lineColor, smoothstep(0.1, 0.0, abs(lines)) * 0.35);
-      }
-
-      // 5. Magnetic Field Lines
-      vec3 renderPanel5(vec2 uv) {
-          vec2 p = uv * 2.0 - 1.0;
-          vec2 m1 = vec2(sin(u_time), cos(u_time)) * 0.5;
-          vec2 m2 = -m1;
-          vec2 v1 = p - m1; vec2 v2 = p - m2;
-          float field = length(v1)/dot(v1,v1) - length(v2)/dot(v2,v2);
-          float grid = abs(fract(field * 5.0) - 0.5) / fwidth(field * 5.0);
-          return mix(u_bgColor, u_lineColor, (1.0 - smoothstep(0.0, 1.2, grid)) * 0.35);
-      }
-
-      // 6. Crystal Growth
-      vec3 renderPanel6(vec2 uv) {
-          vec2 p = (uv - 0.5) * 2.0;
-          float a = atan(p.y, p.x);
-          float r = length(p);
-          float shape = abs(sin(a * 3.0 + u_time * 0.2)) * 0.5 + 0.2;
-          float crystal = smoothstep(shape, shape - 0.02, r);
-          float facets = abs(fract(r * 15.0 - u_time) - 0.5) / fwidth(r * 15.0);
-          vec3 col = mix(u_bgColor, u_lineColor, crystal * 0.15);
-          col = mix(col, u_lineColor, (1.0 - smoothstep(0.0, 1.0, facets)) * crystal * 0.35);
-          return col;
+          float m = clamp(d * 0.28, 0.0, 1.0);
+          return mix(u_bgColor, u_lineColor, m * 0.45);
       }
 
       void main() {
-          vec3 col;
+          vec3 col = renderPanel1(vUv);
           
           if (u_panel == 0) {
-              vec2 grid = floor(vUv * vec2(3.0, 2.0));
+              // Render clean grid overlay on top of soft blurry aura (for dashboard)
               vec2 localUV = fract(vUv * vec2(3.0, 2.0));
-              
-              int index = int(grid.x + grid.y * 3.0);
-              if(index == 0) col = renderPanel1(localUV);
-              else if(index == 1) col = renderPanel2(localUV);
-              else if(index == 2) col = renderPanel3(localUV);
-              else if(index == 3) col = renderPanel4(localUV);
-              else if(index == 4) col = renderPanel5(localUV);
-              else col = renderPanel6(localUV);
-
-              // Grid borders
               vec2 border = smoothstep(0.005, 0.0, localUV) + smoothstep(0.995, 1.0, localUV);
-              if(max(border.x, border.y) > 0.5) col = u_lineColor * 0.5; // clear grid lines
-          } else {
-              if(u_panel == 1) col = renderPanel1(vUv);
-              else if(u_panel == 2) col = renderPanel2(vUv);
-              else if(u_panel == 3) col = renderPanel3(vUv);
-              else if(u_panel == 4) col = renderPanel4(vUv);
-              else if(u_panel == 5) col = renderPanel5(vUv);
-              else col = renderPanel6(vUv);
+              if(max(border.x, border.y) > 0.5) col = mix(col, u_lineColor, 0.15);
           }
 
           // Noise grain

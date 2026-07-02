@@ -330,39 +330,43 @@ export default function NotesBundlesPage() {
           };
 
           return (
-            <ParticleCard
+            <Link
               key={note.id}
-              glowColor={rgbColorString}
-              className={`p-8 flex flex-col justify-between transition-all duration-200 hover:scale-[1.01] magic-bento-card magic-bento-card--border-glow rounded-[28px] overflow-hidden ${getResponsiveSpan(note.gridSpan)}`}
-              style={{ backgroundColor: cardBg, '--glow-color': rgbColorString } as any}
-              onClick={() => router.push(`/notes/editor/${note.id}`)}
-              enableTilt={false}
-              clickEffect={true}
-              enableMagnetism={false}
-              particleCount={6}
+              href={`/notes/editor/${note.id}`}
+              className={`block transition-all duration-200 hover:scale-[1.01] ${getResponsiveSpan(note.gridSpan)}`}
             >
-              {/* Colored Glow Orb mimicking the Variant Aura visual style */}
-              <div 
-                className="absolute top-[-30px] right-[-30px] w-32 h-32 rounded-full pointer-events-none opacity-45 z-0"
-                style={{ 
-                  background: isDarkCard 
-                    ? 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%)' 
-                    : `radial-gradient(circle, ${blockColor} 0%, transparent 70%)`,
-                  filter: 'blur(20px)'
-                }}
-              />
-              <span className={`text-xs font-sans tracking-widest uppercase ${descColor} z-10`}>
-                {bundle?.name || 'unsorted'}
-              </span>
-              <div className="mt-6 flex-grow flex flex-col justify-end z-10">
-                <h3 className={`text-2xl font-serif not-italic font-normal ${textColor} truncate z-10`}>
-                  {note.title}
-                </h3>
-                <p className={`text-sm mt-2 line-clamp-3 font-serif ${descColor} z-10`}>
-                  {cleanTextPreview}
-                </p>
-              </div>
-            </ParticleCard>
+              <ParticleCard
+                glowColor={rgbColorString}
+                className="p-8 flex flex-col justify-between magic-bento-card magic-bento-card--border-glow rounded-[28px] overflow-hidden w-full h-full"
+                style={{ backgroundColor: cardBg, '--glow-color': rgbColorString } as any}
+                enableTilt={false}
+                clickEffect={true}
+                enableMagnetism={false}
+                particleCount={6}
+              >
+                {/* Colored Glow Orb mimicking the Variant Aura visual style */}
+                <div 
+                  className="absolute top-[-30px] right-[-30px] w-32 h-32 rounded-full pointer-events-none opacity-45 z-0"
+                  style={{ 
+                    background: isDarkCard 
+                      ? 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%)' 
+                      : `radial-gradient(circle, ${blockColor} 0%, transparent 70%)`,
+                    filter: 'blur(20px)'
+                  }}
+                />
+                <span className={`text-xs font-sans tracking-widest uppercase ${descColor} z-10`}>
+                  {bundle?.name || 'unsorted'}
+                </span>
+                <div className="mt-6 flex-grow flex flex-col justify-end z-10">
+                  <h3 className={`text-2xl font-serif not-italic font-normal ${textColor} truncate z-10`}>
+                    {note.title}
+                  </h3>
+                  <p className={`text-sm mt-2 line-clamp-3 font-serif ${descColor} z-10`}>
+                    {cleanTextPreview}
+                  </p>
+                </div>
+              </ParticleCard>
+            </Link>
           );
         })}
       </BentoCardGrid>

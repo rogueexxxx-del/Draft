@@ -54,8 +54,8 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-transparent select-none relative overflow-hidden">
-      {/* Generative WebGL fractal terrain backdrop (panel 2) */}
-      <ShaderCanvas panel={2} opacity={1.0} />
+      {/* Generative WebGL fractal terrain backdrop (panel 1) */}
+      <ShaderCanvas panel={1} opacity={1.0} />
 
       <div className="w-full max-w-lg flex flex-col items-center space-y-16 z-10">
         

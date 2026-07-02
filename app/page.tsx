@@ -32,8 +32,8 @@ export default function WelcomePage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-transparent select-none">
-      {/* Generative WebGL liquid waves background (panel 4) */}
-      <ShaderCanvas panel={4} opacity={1.0} />
+      {/* Generative WebGL liquid waves background (panel 1) */}
+      <ShaderCanvas panel={1} opacity={1.0} />
 
       {/* Hero Composition */}
       <div className="z-10 flex flex-col items-center text-center space-y-16 max-w-full">
@@ -47,13 +47,13 @@ export default function WelcomePage() {
           />
 
           {/* Tagline: Two separate, independently positioned fragments */}
-          <div className="w-full flex justify-between mt-4 sm:mt-6 px-2 font-serif not-italic text-xl sm:text-2xl md:text-3xl text-[var(--color-ink)]">
+          <div className="w-full flex justify-between mt-[-10px] sm:mt-[-20px] md:mt-[-32px] px-2 font-serif not-italic text-xl sm:text-2xl md:text-3xl text-[var(--color-ink)]">
             {/* Left fragment: positioned left-aligned under "Dra" */}
-            <span className="text-left w-[45%] leading-none whitespace-nowrap">
+            <span className="text-left w-[45%] leading-none whitespace-nowrap pl-2 sm:pl-0">
               a <span className="italic">f</span>ocused centered
             </span>
             {/* Right fragment: positioned right-aligned under "ft" */}
-            <span className="text-right w-[45%] leading-none whitespace-nowrap">
+            <span className="text-right w-[45%] leading-none whitespace-nowrap pr-8 sm:pr-0">
               creative tool
             </span>
           </div>
