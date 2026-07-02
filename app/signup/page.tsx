@@ -87,7 +87,6 @@ export default function SignupPage() {
         <form onSubmit={handleSignup} className="w-full flex flex-col space-y-4">
           <input
             type="email"
-            placeholder="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="E-M4IL"
@@ -104,9 +103,9 @@ export default function SignupPage() {
           />
           <input
             type="password"
-            placeholder="confirm password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="C0NFIRM P4SSW0RD"
             required
             className="w-full p-4 glass-panel text-[var(--color-surface)] focus:outline-none placeholder:text-white/60 placeholder:italic text-lg outline-none"
           />
