@@ -33,7 +33,7 @@ export default function WelcomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-transparent select-none">
       {/* Generative WebGL liquid waves background (panel 4) */}
-      <ShaderCanvas panel={4} opacity={1.0} />
+      <ShaderCanvas panel={4} opacity={0.4} />
 
       {/* Hero Composition */}
       <div className="z-10 flex flex-col items-center text-center space-y-16 max-w-full">
