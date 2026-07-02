@@ -8,7 +8,7 @@ export async function proxy(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy',
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'dummy',
     {
       cookies: {
         getAll() {
