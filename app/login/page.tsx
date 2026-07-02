@@ -77,24 +77,24 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="E-M4IL"
+            placeholder="email"
             required
-            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-[var(--color-ink)] focus:outline-none placeholder:text-center placeholder:text-[var(--color-muted)]/60 placeholder:text-xs outline-none"
+            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-black focus:outline-none placeholder:text-center placeholder:text-black/40 placeholder:text-xs outline-none"
           />
           <input 
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="P4SSW0RD"
+            placeholder="password"
             required
-            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-[var(--color-ink)] focus:outline-none placeholder:text-center placeholder:text-[var(--color-muted)]/60 placeholder:text-xs outline-none"
+            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-black focus:outline-none placeholder:text-center placeholder:text-black/40 placeholder:text-xs outline-none"
           />
           {error && <div className="text-red-600 glass-panel px-3 py-1.5 text-xs text-center rounded-full">{error}</div>}
           <button 
             type="submit" 
             className="w-full h-[35px] rounded-full glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity text-xs"
           >
-            L0GIN
+            login
           </button>
         </form>
 

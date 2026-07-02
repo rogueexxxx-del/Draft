@@ -297,8 +297,8 @@ export default function NotesBundlesPage() {
           const bundle = bundles.find(b => b.id === note.bundleId);
           const blockColor = bundle?.color || '#D9D9D9';
           
-          // Make the background color transparent glass (0.75 opacity for rich color, but letting backing show)
-          const glassColor = hexToRgba(blockColor, 0.75);
+          // Make the background color transparent glass (0.5 opacity for richer glass blur)
+          const glassColor = hexToRgba(blockColor, 0.5);
           const rgbColorString = hexToRgbString(blockColor);
 
           // Reverse text color logic for clear bento grid display
@@ -317,9 +317,10 @@ export default function NotesBundlesPage() {
               className={`p-8 flex flex-col justify-between transition-all duration-200 hover:scale-[1.01] magic-bento-card magic-bento-card--border-glow ${note.gridSpan || 'col-span-1 row-span-1'}`}
               style={{ backgroundColor: glassColor, '--glow-color': rgbColorString } as any}
               onClick={() => router.push(`/notes/editor/${note.id}`)}
-              enableTilt={true}
+              enableTilt={false}
               clickEffect={true}
-              enableMagnetism={true}
+              enableMagnetism={false}
+              particleCount={6}
             >
               <span className={`text-xs font-sans tracking-widest uppercase ${descColor} z-10`}>
                 {bundle?.name || 'unsorted'}
@@ -355,14 +356,14 @@ export default function NotesBundlesPage() {
             <form onSubmit={handleCreateBundle} className="flex flex-col space-y-4">
               <input 
                 type="text"
-                placeholder="Bundle Name"
+                placeholder="bundle name"
                 value={bundleName}
                 onChange={(e) => setBundleName(e.target.value)}
                 required
                 className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel-dark text-white focus:outline-none placeholder:text-center placeholder:text-white/50 placeholder:text-xs outline-none"
               />
               <textarea 
-                placeholder="Description (Optional)"
+                placeholder="description (optional)"
                 value={bundleDesc}
                 onChange={(e) => setBundleDesc(e.target.value)}
                 className="w-full px-4 py-2 rounded-2xl text-center text-xs font-normal glass-panel-dark text-white focus:outline-none placeholder:text-center placeholder:text-white/50 placeholder:text-xs h-20 resize-none outline-none"

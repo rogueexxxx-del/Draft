@@ -88,25 +88,25 @@ export default function SignupPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="E-M4IL"
+            placeholder="email"
             required
-            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-[var(--color-surface)] focus:outline-none placeholder:text-center placeholder:text-white/60 placeholder:text-xs outline-none"
+            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-black focus:outline-none placeholder:text-center placeholder:text-black/40 placeholder:text-xs outline-none"
           />
           <input 
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="P4SSW0RD"
+            placeholder="password"
             required
-            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-[var(--color-surface)] focus:outline-none placeholder:text-center placeholder:text-white/60 placeholder:text-xs outline-none"
+            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-black focus:outline-none placeholder:text-center placeholder:text-black/40 placeholder:text-xs outline-none"
           />
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="C0NFIRM P4SSW0RD"
+            placeholder="confirm password"
             required
-            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-[var(--color-surface)] focus:outline-none placeholder:text-center placeholder:text-white/60 placeholder:text-xs outline-none"
+            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-black focus:outline-none placeholder:text-center placeholder:text-black/40 placeholder:text-xs outline-none"
           />
           
           {error && <p className="text-red-300 glass-panel-dark px-3 py-1.5 text-xs text-center rounded-full">{error}</p>}
@@ -116,7 +116,7 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full h-[35px] rounded-full glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:scale-[1.02] disabled:opacity-50 transition-all text-xs"
           >
-            {loading ? 'PR0CESSING...' : 'S1GN UP'}
+            {loading ? 'processing...' : 'sign up'}
           </button>
         </form>
 
