@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ShaderCanvasProps {
   panel?: number; // 0 = all grid, 1 = metaballs, 2 = terrain, 3 = particles, 4 = liquid, 5 = magnet, 6 = crystal
@@ -10,6 +10,16 @@ interface ShaderCanvasProps {
 
 export default function ShaderCanvas({ panel = 0, theme = 'light', opacity = 1.0 }: ShaderCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -185,6 +195,12 @@ export default function ShaderCanvas({ panel = 0, theme = 'light', opacity = 1.0
         return;
       }
 
+      // Bind VAO to satisfy strict WebGL 2 drivers on mobile Safari/WebKit
+      const vao = gl.createVertexArray();
+      if (vao) {
+        gl.bindVertexArray(vao);
+      }
+
       gl.useProgram(program);
 
       const uRes = gl.getUniformLocation(program, "u_resolution");
@@ -236,6 +252,7 @@ export default function ShaderCanvas({ panel = 0, theme = 'light', opacity = 1.0
         cancelAnimationFrame(animationFrameId);
         if (vs) gl.deleteShader(vs);
         if (fs) gl.deleteShader(fs);
+        if (vao) gl.deleteVertexArray(vao);
         gl.deleteProgram(program);
       };
     }
@@ -244,7 +261,7 @@ export default function ShaderCanvas({ panel = 0, theme = 'light', opacity = 1.0
   return (
     <canvas 
       ref={canvasRef} 
-      style={{ opacity, filter: 'blur(30px)' }}
+      style={{ opacity, filter: isMobile ? 'blur(8px)' : 'blur(20px)' }}
       className="fixed inset-0 w-full h-full z-0 pointer-events-none select-none no-print scale-125 transform-gpu"
     />
   );

@@ -47,7 +47,7 @@ export default function WelcomePage() {
           />
 
           {/* Tagline: Two separate, independently positioned fragments */}
-          <div className="w-full flex justify-between mt-[-24px] sm:mt-[-36px] md:mt-[-48px] px-2 font-serif not-italic text-xl sm:text-2xl md:text-3xl text-[var(--color-ink)]">
+          <div className="w-full flex justify-between mt-4 sm:mt-6 px-2 font-serif not-italic text-xl sm:text-2xl md:text-3xl text-[var(--color-ink)]">
             {/* Left fragment: positioned left-aligned under "Dra" */}
             <span className="text-left w-[45%] leading-none whitespace-nowrap">
               a <span className="italic">f</span>ocused centered

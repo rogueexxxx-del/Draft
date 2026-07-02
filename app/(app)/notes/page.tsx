@@ -310,11 +310,27 @@ export default function NotesBundlesPage() {
             ? note.content.replace(/<[^>]*>/g, ' ').substring(0, 120)
             : 'empty note...';
 
+          const getResponsiveSpan = (span?: string) => {
+            if (!span) return 'col-span-1 row-span-1';
+            let classes = [];
+            if (span.includes('col-span-2')) {
+              classes.push('sm:col-span-2 col-span-1');
+            } else {
+              classes.push('col-span-1');
+            }
+            if (span.includes('row-span-2')) {
+              classes.push('sm:row-span-2 row-span-1');
+            } else {
+              classes.push('row-span-1');
+            }
+            return classes.join(' ');
+          };
+
           return (
             <ParticleCard
               key={note.id}
               glowColor={rgbColorString}
-              className={`p-8 flex flex-col justify-between transition-all duration-200 hover:scale-[1.01] magic-bento-card magic-bento-card--border-glow ${note.gridSpan || 'col-span-1 row-span-1'}`}
+              className={`p-8 flex flex-col justify-between transition-all duration-200 hover:scale-[1.01] magic-bento-card magic-bento-card--border-glow ${getResponsiveSpan(note.gridSpan)}`}
               style={{ backgroundColor: glassColor, '--glow-color': rgbColorString } as any}
               onClick={() => router.push(`/notes/editor/${note.id}`)}
               enableTilt={false}
