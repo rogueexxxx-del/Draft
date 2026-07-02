@@ -1,0 +1,16 @@
+{
+  "name": "Draft",
+  "short_name": "Draft",
+  "description": "A focus centered creative tool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/draft.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
