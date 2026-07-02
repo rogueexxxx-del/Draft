@@ -332,7 +332,8 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       const dataUrl = await toJpeg(pageRef.current, {
         quality: 0.98,
         skipFonts: true, // Prevents custom relative stylesheet font loading failures
-        styleSheetFilter: () => false, // Skips stylesheet fetching to avoid relative font path crashes
+        // @ts-expect-error styleSheetFilter is not in Options type but works at runtime
+        styleSheetFilter: () => false, // Skips stylesheet fetching to avoid relative font errors
         style: {
           backgroundAttachment: 'scroll', // fixes background fixed rendering bugs in html-to-image
           backgroundBlendMode: themeBgImage ? themeBlendMode : 'normal',

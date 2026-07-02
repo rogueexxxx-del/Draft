@@ -279,7 +279,7 @@ export default function NotesBundlesPage() {
       )}
 
       {/* BENTO GRID OF NOTES */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full">
         {filteredNotes.map((note) => {
           const bundle = bundles.find(b => b.id === note.bundleId);
           const blockColor = bundle?.color || '#D9D9D9';
