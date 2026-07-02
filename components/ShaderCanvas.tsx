@@ -202,7 +202,7 @@ export default function ShaderCanvas({ panel = 0, theme = 'light', opacity = 1.0
         lineVec = [1.0, 1.0, 1.0]; // White
       } else if (theme === 'rust') {
         bgVec = [0.867, 0.251, 0.039]; // Rust #DD400A
-        lineVec = [0.5, 0.12, 0.0]; // Darker monotone rust instead of white
+        lineVec = [1.0, 1.0, 1.0]; // White
       }
 
       gl.uniform3f(uBgColor, bgVec[0], bgVec[1], bgVec[2]);
