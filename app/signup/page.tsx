@@ -90,16 +90,17 @@ export default function SignupPage() {
             placeholder="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="E-M4IL"
             required
-            className="w-full p-4 bg-[var(--color-surface)] text-[var(--color-ink)] placeholder-[#808080] placeholder:not-italic focus:outline-none rounded-none text-lg text-center"
+            className="w-full p-4 glass-panel text-[var(--color-surface)] focus:outline-none placeholder:text-white/60 placeholder:italic text-lg outline-none"
           />
-          <input
+          <input 
             type="password"
-            placeholder="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="P4SSW0RD"
             required
-            className="w-full p-4 bg-[var(--color-surface)] text-[var(--color-ink)] placeholder-[#808080] placeholder:not-italic focus:outline-none rounded-none text-lg text-center"
+            className="w-full p-4 glass-panel text-[var(--color-surface)] focus:outline-none placeholder:text-white/60 placeholder:italic text-lg outline-none"
           />
           <input
             type="password"
@@ -107,17 +108,17 @@ export default function SignupPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className="w-full p-4 bg-[var(--color-surface)] text-[var(--color-ink)] placeholder-[#808080] placeholder:not-italic focus:outline-none rounded-none text-lg text-center"
+            className="w-full p-4 glass-panel text-[var(--color-surface)] focus:outline-none placeholder:text-white/60 placeholder:italic text-lg outline-none"
           />
           
-          {error && <p className="text-[var(--color-surface)] text-sm text-center font-serif bg-black/20 py-2">{error}</p>}
+          {error && <p className="text-red-300 glass-panel-dark p-3 text-sm">{error}</p>}
           
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 mt-4 bg-[var(--color-ink)] text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity rounded-none text-base disabled:opacity-50"
+            className="w-full p-4 glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:scale-[1.02] disabled:opacity-50 transition-all text-base"
           >
-            {loading ? 'CREATING...' : 'CREATE ACCOUNT'}
+            {loading ? 'PR0CESSING...' : 'S1GN UP'}
           </button>
         </form>
 

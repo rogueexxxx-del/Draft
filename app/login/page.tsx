@@ -74,30 +74,29 @@ export default function LoginPage() {
 
         {/* FORM */}
         <form onSubmit={handleLogin} className="w-full flex flex-col space-y-4">
-          <input
+          <input 
             type="email"
-            placeholder="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="E-M4IL"
             required
-            className="w-full p-4 bg-[var(--color-input-bg)] text-[var(--color-ink)] placeholder-[#808080] placeholder:not-italic focus:outline-none rounded-none text-lg text-center"
+            className="w-full p-4 glass-panel text-[var(--color-ink)] focus:outline-none placeholder:text-[var(--color-muted)] placeholder:italic text-lg outline-none"
           />
-          <input
+          <input 
             type="password"
-            placeholder="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="P4SSW0RD"
             required
-            className="w-full p-4 bg-[var(--color-input-bg)] text-[var(--color-ink)] placeholder-[#808080] placeholder:not-italic focus:outline-none rounded-none text-lg text-center"
+            className="w-full p-4 glass-panel text-[var(--color-ink)] focus:outline-none placeholder:text-[var(--color-muted)] placeholder:italic text-lg outline-none"
           />
-          
-          {error && <p className="text-red-500 text-sm text-center font-serif">{error}</p>}
-          
-          <button
-            type="submit"
-            className="w-full py-4 mt-4 bg-[var(--color-ink)] text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity rounded-none text-base"
+          {error && <div className="text-red-600 glass-panel p-3 text-sm">{error}</div>}
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full p-4 glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity"
           >
-            LOG IN
+            {loading ? 'AUTH3NTIC4TING...' : 'L0GIN'}
           </button>
         </form>
 

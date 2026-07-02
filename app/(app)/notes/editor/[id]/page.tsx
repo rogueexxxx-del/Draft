@@ -50,12 +50,12 @@ const CommandList = forwardRef((props: any, ref) => {
   }));
 
   return (
-    <div className="bg-[var(--color-surface)] border border-[var(--color-ink)] p-2 flex flex-col shadow-lg z-50 min-w-[200px] select-none no-print">
+    <div className="glass-panel p-2 flex flex-col shadow-lg z-50 min-w-[200px] select-none no-print">
       {props.items.length ? (
         props.items.map((item: any, index: number) => (
           <button
             className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider ${
-              index === selectedIndex ? 'bg-[var(--color-ink)] text-[var(--color-surface)]' : 'text-[var(--color-ink)] bg-transparent'
+              index === selectedIndex ? 'bg-white/20' : 'bg-transparent hover:bg-white/10'
             }`}
             key={index}
             onClick={() => selectItem(index)}
@@ -472,7 +472,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
 
             {/* SETTINGS PANEL DROPDOWN */}
             {showMenu && (
-              <div className={`absolute right-0 top-10 w-72 p-5 border shadow-xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 ${dropdownBg}`}>
+              <div className={`absolute right-0 top-10 w-72 p-5 shadow-xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 ${isDarkTheme ? 'glass-panel-dark text-white' : 'glass-panel text-[var(--color-ink)]'}`}>
                 
                 {/* THEME CONFIGURATORS (FIRST) */}
                 <div className="flex flex-col space-y-4">
@@ -608,7 +608,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 no-print">
           <button
             onClick={handleSave}
-            className={`flex items-center space-x-2 text-xl font-degraded not-italic hover:underline border px-6 py-3 transition-colors ${btnBg}`}
+            className={`flex items-center space-x-2 text-xl font-degraded not-italic hover:scale-105 transition-transform px-6 py-3 ${isDarkTheme ? 'glass-panel-dark' : 'glass-panel'}`}
           >
             <span>+ SAVE NOTE</span>
           </button>
