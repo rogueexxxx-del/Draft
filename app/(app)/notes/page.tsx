@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import { Star } from 'lucide-react';
+import { Star, MoreHorizontal } from 'lucide-react';
 import ShaderCanvas from '@/components/ShaderCanvas';
 
 interface Bundle {
@@ -68,12 +68,7 @@ export default function NotesBundlesPage() {
         { id: 'journal', name: 'Journal', description: 'daily thoughts', color: '#141414' },
       ];
 
-      const defaultNotes: Note[] = [
-        { id: 'note-1', title: 'Character Outline', content: 'Hero archetype definition...', bundleId: 'feature-film', updatedAt: '2026-07-02', gridSpan: 'col-span-2 row-span-1' },
-        { id: 'note-2', title: 'Act I Beats', content: 'Inciting incident at minute 10...', bundleId: 'feature-film', updatedAt: '2026-07-02', gridSpan: 'col-span-1 row-span-2' },
-        { id: 'note-3', title: 'Reflections', content: 'Writing early in the morning feels better...', bundleId: 'journal', updatedAt: '2026-07-01', gridSpan: 'col-span-2 row-span-1' },
-        { id: 'note-4', title: 'Fast Capture Note', content: 'A quick unstructured brain dump...', bundleId: 'unsorted', updatedAt: '2026-07-02', gridSpan: 'col-span-1 row-span-1' },
-      ];
+      const defaultNotes: Note[] = [];
 
       if (isGuest) {
         const localBundles = localStorage.getItem('draft_bundles');
@@ -89,8 +84,8 @@ export default function NotesBundlesPage() {
         if (localNotes) {
           setNotes(JSON.parse(localNotes));
         } else {
-          setNotes(defaultNotes);
-          localStorage.setItem('draft_notes', JSON.stringify(defaultNotes));
+          setNotes([]);
+          localStorage.setItem('draft_notes', JSON.stringify([]));
         }
       } else {
         const supabase = createClient();
@@ -105,15 +100,7 @@ export default function NotesBundlesPage() {
 
         let { data: notesData } = await supabase.from('notes').select('*');
         if (!notesData || notesData.length === 0) {
-          const formattedDefaults = defaultNotes.map(n => ({
-            id: n.id,
-            title: n.title,
-            content: n.content,
-            bundle_id: n.bundleId,
-            grid_span: n.gridSpan,
-          }));
-          await supabase.from('notes').insert(formattedDefaults);
-          setNotes(defaultNotes);
+          setNotes([]);
         } else {
           const mappedNotes = notesData.map((n: any) => ({
             id: n.id,
@@ -194,6 +181,25 @@ export default function NotesBundlesPage() {
     }
 
     router.push(`/notes/editor/${newNoteId}`);
+  };
+
+  const handleDeleteNoteDirectly = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this note?')) return;
+    const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
+
+    if (isGuest) {
+      const localNotes = localStorage.getItem('draft_notes');
+      if (localNotes) {
+        const notesList = JSON.parse(localNotes);
+        const updated = notesList.filter((n: any) => n.id !== id);
+        setNotes(updated);
+        localStorage.setItem('draft_notes', JSON.stringify(updated));
+      }
+    } else {
+      const supabase = createClient();
+      await supabase.from('notes').delete().eq('id', id);
+      setNotes(notes.filter(n => n.id !== id));
+    }
   };
 
   const toggleStar = (id: string, e: React.MouseEvent) => {
@@ -328,12 +334,15 @@ export default function NotesBundlesPage() {
             : 'h-[220px] sm:h-[280px]';
 
           return (
-            <Link
+            <div
               key={note.id}
-              href={`/notes/editor/${note.id}`}
-              className={`block transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass}`}
+              className={`relative group rounded-[28px] overflow-hidden border transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass} ${cardBgClass}`}
             >
-              <div className={`relative p-8 flex flex-col justify-between rounded-[28px] overflow-hidden w-full h-full border transition-all duration-300 ${cardBgClass}`}>
+              {/* Card content linking to editor */}
+              <Link
+                href={`/notes/editor/${note.id}`}
+                className="absolute inset-0 p-8 flex flex-col justify-between z-10"
+              >
                 {/* Colored Glow Orb mimicking the Variant Aura visual style */}
                 <div 
                   className="absolute -top-12 -right-12 w-32 h-32 rounded-full pointer-events-none opacity-[0.15] z-0 animate-pulse duration-3000"
@@ -344,7 +353,7 @@ export default function NotesBundlesPage() {
                 />
                 
                 {/* Top Info */}
-                <div className="flex justify-between items-start z-10 w-full">
+                <div className="flex justify-between items-start z-10 w-full pr-8">
                   <span className={`text-[10px] font-sans font-semibold tracking-widest uppercase opacity-60 ${isDarkCard ? 'text-white' : 'text-[var(--color-ink)]'}`}>
                     {bundle?.name || 'unsorted'}
                   </span>
@@ -363,8 +372,15 @@ export default function NotesBundlesPage() {
                     {cleanTextPreview}
                   </p>
                 </div>
-              </div>
-            </Link>
+              </Link>
+
+              {/* Note options menu (delete button) */}
+              <CardMenu 
+                noteId={note.id} 
+                isDarkCard={isDarkCard} 
+                onDelete={() => handleDeleteNoteDirectly(note.id)} 
+              />
+            </div>
           );
         })}
       </div>
@@ -433,6 +449,58 @@ export default function NotesBundlesPage() {
         </div>
       )}
 
+    </div>
+  );
+}
+
+function CardMenu({ noteId, isDarkCard, onDelete }: { noteId: string; isDarkCard: boolean; onDelete: () => void }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="absolute right-4 top-6 z-30 no-print">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setOpen(!open);
+        }}
+        className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-60 hover:opacity-100 ${
+          isDarkCard ? 'text-white' : 'text-[var(--color-ink)]'
+        }`}
+        title="Note options"
+      >
+        <MoreHorizontal size={18} />
+      </button>
+
+      {open && (
+        <>
+          <div 
+            className="fixed inset-0 z-40 bg-transparent" 
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setOpen(false);
+            }}
+          />
+          <div className={`absolute right-0 top-8 w-36 py-1.5 shadow-xl z-50 rounded-xl border animate-in fade-in slide-in-from-top-2 duration-150 ${
+            isDarkCard 
+              ? 'bg-zinc-900 border-white/10 text-white' 
+              : 'bg-white border-black/10 text-zinc-900'
+          }`}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setOpen(false);
+                onDelete();
+              }}
+              className="w-full text-left px-4 py-2 text-xs font-sans font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+            >
+              Delete Note
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

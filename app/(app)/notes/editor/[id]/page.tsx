@@ -463,174 +463,188 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       <div className="relative z-10 w-full flex-grow flex flex-col py-12 px-12 md:px-24">
         
         {/* Top Bar / Heading block */}
-        <div className="flex flex-col items-center w-full mb-12 relative">
+        <div className="flex justify-between items-center w-full mb-12 gap-4 relative z-40">
           {/* Back Arrow link on Left */}
           <Link 
             href="/notes" 
-            className={`absolute left-0 top-3 hover:opacity-75 transition-opacity no-print ${textColor}`}
+            className={`hover:opacity-75 transition-opacity no-print shrink-0 ${textColor}`}
           >
-            <ArrowLeft size={28} strokeWidth={1.5} />
+            <ArrowLeft size={24} strokeWidth={1.5} />
           </Link>
 
-          {/* Bigger Title input */}
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="UNTITLED"
-            className={`w-full text-center bg-transparent border-none outline-none text-5xl md:text-6xl font-bold uppercase tracking-wider bg-none focus:ring-0 ${textColor} ${placeholderColor}`}
-          />
+          {/* Centered Title input & Description info */}
+          <div className="flex-grow flex flex-col items-center justify-center min-w-0 text-center">
+            {/* Title input */}
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="UNTITLED"
+              className={`w-full text-center bg-transparent border-none outline-none text-2xl sm:text-4xl md:text-5xl font-bold uppercase tracking-wider bg-none focus:ring-0 ${textColor} ${placeholderColor} min-w-0`}
+            />
 
-          {/* Description input */}
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="ADD DESCRIPTION"
-            className={`w-full text-center bg-transparent border-none outline-none text-lg mt-2 uppercase tracking-wide focus:ring-0 font-serif ${mutedTextColor} ${placeholderColor}`}
-          />
+            {/* Description input */}
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="ADD DESCRIPTION"
+              className={`w-full text-center bg-transparent border-none outline-none text-xs sm:text-sm mt-1.5 uppercase tracking-wide focus:ring-0 font-serif ${mutedTextColor} ${placeholderColor} min-w-0`}
+            />
+          </div>
 
           {/* Settings Hamburger Button on Right */}
-          <div className="absolute right-0 top-3 no-print">
+          <div className="relative shrink-0 no-print">
             <button 
               onClick={() => setShowMenu(!showMenu)} 
               className={`hover:opacity-75 transition-opacity ${textColor}`}
             >
-              <MoreHorizontal size={28} strokeWidth={1.5} />
+              <MoreHorizontal size={24} strokeWidth={1.5} />
             </button>
 
             {/* SETTINGS PANEL DROPDOWN */}
             {showMenu && (
-              <div className={`absolute right-0 top-10 w-72 p-5 shadow-xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 ${isDarkTheme ? 'glass-panel-dark text-white' : 'glass-panel text-[var(--color-ink)]'}`}>
-                
-                {/* THEME CONFIGURATORS (FIRST) */}
-                <div className="flex flex-col space-y-4">
-                  <span className="font-degraded italic text-sm tracking-wider uppercase">NOTE THEME</span>
+              <>
+                {/* Click-away backdrop */}
+                <div 
+                  className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1.5px] no-print" 
+                  onClick={() => setShowMenu(false)}
+                />
+                <div className={`absolute right-0 top-10 w-72 max-w-[calc(100vw-32px)] p-6 shadow-2xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 rounded-[24px] border ${
+                  isDarkTheme 
+                    ? 'bg-[#18181b] border-white/10 text-white' 
+                    : 'bg-white border-black/10 text-[var(--color-ink)]'
+                }`}>
                   
-                  {/* Color presets selection */}
-                  <div className="flex flex-col space-y-2">
-                    <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>background fill</span>
-                    <div className="flex space-x-3">
-                      {['#FFFFFF', '#141414', '#DD400A'].map((color) => (
-                        <button
-                          key={color}
-                          type="button"
-                          onClick={() => setThemeBgColor(color)}
-                          className={`w-8 h-8 transition-transform border ${
-                            themeBgColor === color 
-                              ? isDarkTheme ? 'border-white scale-110' : 'border-black scale-110' 
-                              : 'border-transparent hover:scale-105'
-                          }`}
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Local Background image upload */}
-                  <div className="flex flex-col space-y-2">
-                    <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>background image</span>
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center justify-center p-2.5 border border-dashed border-current hover:opacity-75 transition-opacity cursor-pointer">
-                        <Plus size={16} className="mr-1" />
-                        <span className="font-degraded not-italic text-[10px] uppercase tracking-wider">UPLOAD</span>
-                        <input 
-                          type="file" 
-                          accept="image/*" 
-                          onChange={handleBgImageUpload} 
-                          className="hidden" 
-                        />
-                      </label>
-                      {themeBgImage && (
-                        <button
-                          type="button"
-                          onClick={() => setThemeBgImage(null)}
-                          className="font-degraded not-italic text-xs text-red-500 underline hover:opacity-75"
-                        >
-                          REMOVE
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Image Adjustments (Only shown if bg image is uploaded) */}
-                  {themeBgImage && (
-                    <div className="flex flex-col space-y-3 pt-2.5 border-t border-current/10">
-                      {/* Blend mode settings */}
-                      <div className="flex flex-col space-y-1.5">
-                        <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>overlay blend</span>
-                        <div className="flex space-x-2 text-xs">
-                          {['multiply', 'overlay', 'normal'].map((mode) => (
-                            <button
-                              key={mode}
-                              type="button"
-                              onClick={() => setThemeBlendMode(mode)}
-                              className={`font-degraded uppercase tracking-wide underline ${themeBlendMode === mode ? 'font-bold opacity-100' : 'opacity-50 hover:opacity-80'}`}
-                            >
-                              {mode}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Grayscale / Saturation settings */}
-                      <div className="flex flex-col space-y-1.5">
-                        <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>saturation</span>
-                        <div className="flex space-x-3 text-xs">
-                          {[
-                            { name: 'color', label: 'COLOR' },
-                            { name: 'muted', label: 'MUTED' },
-                            { name: 'bw', label: 'B&W' }
-                          ].map((sat) => (
-                            <button
-                              key={sat.name}
-                              type="button"
-                              onClick={() => setThemeBgSaturation(sat.name)}
-                              className={`font-degraded uppercase tracking-wide underline ${themeBgSaturation === sat.name ? 'font-bold opacity-100' : 'opacity-50 hover:opacity-80'}`}
-                            >
-                              {sat.label}
-                            </button>
-                          ))}
-                        </div>
+                  {/* THEME CONFIGURATORS (FIRST) */}
+                  <div className="flex flex-col space-y-4">
+                    <span className="font-degraded italic text-sm tracking-wider uppercase">NOTE THEME</span>
+                    
+                    {/* Color presets selection */}
+                    <div className="flex flex-col space-y-2">
+                      <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>background fill</span>
+                      <div className="flex space-x-3">
+                        {['#FFFFFF', '#141414', '#DD400A'].map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            onClick={() => setThemeBgColor(color)}
+                            className={`w-8 h-8 transition-transform border ${
+                              themeBgColor === color 
+                                ? isDarkTheme ? 'border-white scale-110' : 'border-black scale-110' 
+                                : 'border-transparent hover:scale-105'
+                            }`}
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
                       </div>
                     </div>
-                  )}
-                </div>
 
-                {/* DIVIDER */}
-                <hr className={`border ${dividerStyle}`} />
+                    {/* Local Background image upload */}
+                    <div className="flex flex-col space-y-2">
+                      <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>background image</span>
+                      <div className="flex items-center space-x-4">
+                        <label className="flex items-center justify-center p-2.5 border border-dashed border-current hover:opacity-75 transition-opacity cursor-pointer">
+                          <Plus size={16} className="mr-1" />
+                          <span className="font-degraded not-italic text-[10px] uppercase tracking-wider">UPLOAD</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={handleBgImageUpload} 
+                            className="hidden" 
+                          />
+                        </label>
+                        {themeBgImage && (
+                          <button
+                            type="button"
+                            onClick={() => setThemeBgImage(null)}
+                            className="font-degraded not-italic text-xs text-red-500 underline hover:opacity-75"
+                          >
+                            REMOVE
+                          </button>
+                        )}
+                      </div>
+                    </div>
 
-                {/* EXPORT SETTINGS (SECOND) */}
-                <div className="flex flex-col space-y-3">
-                  <span className="font-degraded italic text-sm tracking-wider uppercase">EXPORT SETTINGS</span>
-                  <button 
-                    onClick={handleExportMD}
-                    className="text-left font-degraded not-italic text-xs tracking-wider hover:underline block"
-                  >
-                    EXP<span className="italic">O</span>RT .MD
-                  </button>
-                  <button 
-                    onClick={handleExportPDF}
-                    className="text-left font-degraded not-italic text-xs tracking-wider hover:underline block"
-                  >
-                    EXP<span className="italic">O</span>RT .PDF
-                  </button>
-                  <button 
-                    onClick={handleExportJPG}
-                    className="text-left font-degraded not-italic text-xs tracking-wider hover:underline block"
-                  >
-                    EXP<span className="italic">O</span>RT .JPG
-                  </button>
+                    {/* Image Adjustments (Only shown if bg image is uploaded) */}
+                    {themeBgImage && (
+                      <div className="flex flex-col space-y-3 pt-2.5 border-t border-current/10">
+                        {/* Blend mode settings */}
+                        <div className="flex flex-col space-y-1.5">
+                          <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>overlay blend</span>
+                          <div className="flex space-x-2 text-xs">
+                            {['multiply', 'overlay', 'normal'].map((mode) => (
+                              <button
+                                key={mode}
+                                type="button"
+                                onClick={() => setThemeBlendMode(mode)}
+                                className={`font-degraded uppercase tracking-wide underline ${themeBlendMode === mode ? 'font-bold opacity-100' : 'opacity-50 hover:opacity-80'}`}
+                              >
+                                {mode}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Grayscale / Saturation settings */}
+                        <div className="flex flex-col space-y-1.5">
+                          <span className={`text-[10px] uppercase tracking-widest ${mutedTextColor}`}>saturation</span>
+                          <div className="flex space-x-3 text-xs">
+                            {[
+                              { name: 'color', label: 'COLOR' },
+                              { name: 'muted', label: 'MUTED' },
+                              { name: 'bw', label: 'B&W' }
+                            ].map((sat) => (
+                              <button
+                                key={sat.name}
+                                type="button"
+                                onClick={() => setThemeBgSaturation(sat.name)}
+                                className={`font-degraded uppercase tracking-wide underline ${themeBgSaturation === sat.name ? 'font-bold opacity-100' : 'opacity-50 hover:opacity-80'}`}
+                              >
+                                {sat.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* DIVIDER */}
                   <hr className={`border ${dividerStyle}`} />
-                  <button 
-                    onClick={handleDelete}
-                    className="text-left font-degraded not-italic text-xs tracking-wider text-red-500 hover:underline block"
-                  >
-                    DELETE NOTE
-                  </button>
-                </div>
 
-              </div>
+                  {/* EXPORT SETTINGS (SECOND) */}
+                  <div className="flex flex-col space-y-3">
+                    <span className="font-degraded italic text-sm tracking-wider uppercase">EXPORT SETTINGS</span>
+                    <button 
+                      onClick={handleExportMD}
+                      className="text-left font-degraded not-italic text-xs tracking-wider hover:underline block"
+                    >
+                      EXP<span className="italic">O</span>RT .MD
+                    </button>
+                    <button 
+                      onClick={handleExportPDF}
+                      className="text-left font-degraded not-italic text-xs tracking-wider hover:underline block"
+                    >
+                      EXP<span className="italic">O</span>RT .PDF
+                    </button>
+                    <button 
+                      onClick={handleExportJPG}
+                      className="text-left font-degraded not-italic text-xs tracking-wider hover:underline block"
+                    >
+                      EXP<span className="italic">O</span>RT .JPG
+                    </button>
+                    <hr className={`border ${dividerStyle}`} />
+                    <button 
+                      onClick={handleDelete}
+                      className="text-left font-degraded not-italic text-xs tracking-wider text-red-500 hover:underline block"
+                    >
+                      DELETE NOTE
+                    </button>
+                  </div>
+
+                </div>
+              </>
             )}
           </div>
         </div>
