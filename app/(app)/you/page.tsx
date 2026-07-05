@@ -10,6 +10,7 @@ import { Menu } from 'lucide-react';
 export default function YouPage() {
   const router = useRouter();
   const [email, setEmail] = useState<string>('LOADING...');
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -52,8 +53,67 @@ export default function YouPage() {
     }
   };
 
-  const handleSync = () => {
-    alert('Sync completed successfully.');
+  const handleSync = async () => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user || user.id === 'guest-mock') {
+      alert('PLEASE LOG IN TO SYNC YOUR DATA.');
+      return;
+    }
+
+    setSyncing(true);
+    try {
+      // 1. Sync bundles
+      const localBundlesStr = localStorage.getItem('draft_bundles');
+      if (localBundlesStr) {
+        const localBundles = JSON.parse(localBundlesStr);
+        for (const bundle of localBundles) {
+          // Replace 'guest-mock' suffix with the real user id
+          const cleanId = bundle.id.replace('guest-mock-', `${user.id}-`);
+          
+          await supabase.from('bundles').upsert({
+            id: cleanId,
+            name: bundle.name,
+            description: bundle.description || '',
+            color: bundle.color || '#DD400A',
+            user_id: user.id
+          });
+        }
+      }
+
+      // 2. Sync notes
+      const localNotesStr = localStorage.getItem('draft_notes');
+      if (localNotesStr) {
+        const localNotes = JSON.parse(localNotesStr);
+        for (const note of localNotes) {
+          // Replace guest-mock suffix in bundleId
+          const cleanBundleId = note.bundleId.replace('guest-mock-', `${user.id}-`);
+          
+          await supabase.from('notes').upsert({
+            id: note.id,
+            title: note.title || 'Untitled',
+            content: note.content || '',
+            description: note.description || '',
+            bundle_id: cleanBundleId,
+            grid_span: note.gridSpan || 'col-span-1 row-span-1',
+            theme_settings: note.theme_settings || {},
+            user_id: user.id
+          });
+        }
+      }
+
+      // Clear local storage and cookies so the user doesn't double sync or stay in guest mode
+      localStorage.removeItem('draft_notes');
+      localStorage.removeItem('draft_bundles');
+      
+      alert('SYNC COMPLETED SUCCESSFULLY! ALL LOCAL DATA HAS BEEN SECURELY SAVED TO THE DATABASE.');
+    } catch (err: any) {
+      console.error('Sync failed:', err);
+      alert(`SYNC FAILED: ${err.message}`);
+    } finally {
+      setSyncing(false);
+    }
   };
 
   return (
@@ -97,9 +157,10 @@ export default function YouPage() {
           {/* Sync */}
           <button
             onClick={handleSync}
-            className="text-xl font-serif not-italic hover:underline cursor-pointer tracking-wider text-[var(--color-ink)]"
+            disabled={syncing}
+            className="text-xl font-serif not-italic hover:underline cursor-pointer tracking-wider text-[var(--color-ink)] disabled:opacity-50"
           >
-            S<span className="italic">Y</span>NC
+            {syncing ? 'S Y N C I N G...' : <>S<span className="italic">Y</span>NC</>}
           </button>
 
           {/* Delete Account */}

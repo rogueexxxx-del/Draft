@@ -100,7 +100,7 @@ export default function SignupPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="email"
             required
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           <input 
             type="password"
@@ -108,7 +108,7 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="password"
             required
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           <input
             type="password"
@@ -116,7 +116,7 @@ export default function SignupPage() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="confirm password"
             required
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           
           {error && <div className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}

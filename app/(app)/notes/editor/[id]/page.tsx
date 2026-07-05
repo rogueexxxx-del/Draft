@@ -8,7 +8,7 @@ import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import tippy from 'tippy.js';
-import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle, use } from 'react';
 import { MoreHorizontal, Plus, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toJpeg } from 'html-to-image';
@@ -129,7 +129,8 @@ const SlashCommands = Extension.create({
 });
 
 // --- EDITOR COMPONENT ---
-export default function EditorPage({ params }: { params: { id: string } }) {
+export default function EditorPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: noteId } = use(params);
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -215,7 +216,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
         const localNotes = localStorage.getItem('draft_notes');
         if (localNotes) {
           const notesList = JSON.parse(localNotes);
-          const currentNote = notesList.find((n: any) => n.id === params.id);
+          const currentNote = notesList.find((n: any) => n.id === noteId);
           if (currentNote) {
             setTitle(currentNote.title || '');
             setDescription(currentNote.description || '');
@@ -235,7 +236,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
         const { data: note, error } = await supabase
           .from('notes')
           .select('*')
-          .eq('id', params.id)
+          .eq('id', noteId)
           .single();
 
         if (note && !error) {
@@ -254,7 +255,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
     };
 
     loadNote();
-  }, [params.id, editor]);
+  }, [noteId, editor]);
 
   const handleSave = async () => {
     const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
@@ -271,7 +272,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       if (localNotes) {
         const notesList = JSON.parse(localNotes);
         const updated = notesList.map((n: any) => 
-          n.id === params.id 
+          n.id === noteId 
             ? { 
                 ...n, 
                 title, 
@@ -295,7 +296,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           theme_settings: themeSettings,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', params.id);
+        .eq('id', noteId);
       if (error) {
         console.error("Failed to save note:", error);
         alert(`Failed to save note: ${error.message}`);
@@ -312,12 +313,17 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       const localNotes = localStorage.getItem('draft_notes');
       if (localNotes) {
         const notesList = JSON.parse(localNotes);
-        const updated = notesList.filter((n: any) => n.id !== params.id);
+        const updated = notesList.filter((n: any) => n.id !== noteId);
         localStorage.setItem('draft_notes', JSON.stringify(updated));
       }
     } else {
       const supabase = createClient();
-      await supabase.from('notes').delete().eq('id', params.id);
+      const { error } = await supabase.from('notes').delete().eq('id', noteId);
+      if (error) {
+        console.error("Failed to delete note:", error);
+        alert(`Failed to delete note: ${error.message}`);
+        return;
+      }
     }
     router.push('/notes');
   };
@@ -657,8 +663,10 @@ export default function EditorPage({ params }: { params: { id: string } }) {
         </div>
 
         {/* Editor Content wrapper (Full width, no squeeze) */}
-        <div className="flex-grow w-full relative pt-4">
-          <EditorContent editor={editor} />
+        <div className="flex-grow w-full relative pt-4 pb-20">
+          <div className="glass-panel p-6 sm:p-10 min-h-[60vh] bg-white/70 dark:bg-black/70 shadow-inner border border-black/5 dark:border-white/5 rounded-3xl">
+            <EditorContent editor={editor} />
+          </div>
         </div>
 
         {/* Save Button */}

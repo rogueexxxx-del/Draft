@@ -76,10 +76,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Override all border radii to strictly match the constraint */
-* {
-  border-radius: 0 !important;
-}
+
 
 /* Tiptap Placeholder Styling */
 .tiptap p.is-empty::before {
