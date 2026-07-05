@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { Star } from 'lucide-react';
-import { BentoCardGrid, GlobalSpotlight, ParticleCard } from '@/components/MagicBento';
 import ShaderCanvas from '@/components/ShaderCanvas';
 
 interface Bundle {
@@ -290,31 +289,26 @@ export default function NotesBundlesPage() {
       </div>
 
       {/* BENTO GRID OF NOTES */}
-      <BentoCardGrid gridRef={gridRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full z-20">
-        <GlobalSpotlight
-          gridRef={gridRef}
-          glowColor={selectedBundleId ? hexToRgbString(bundles.find(b => b.id === selectedBundleId)?.color || '#D9D9D9') : '132, 0, 255'}
-          spotlightRadius={300}
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full z-20">
         {filteredNotes.map((note) => {
           const bundle = bundles.find(b => b.id === note.bundleId);
           const blockColor = bundle?.color || '#D9D9D9';
           
           const isDarkCard = blockColor === '#141414';
-          const cardBg = isDarkCard ? 'rgba(28, 28, 30, 0.65)' : 'rgba(245, 245, 247, 0.65)';
-          const rgbColorString = hexToRgbString(blockColor);
+          const cardBgClass = isDarkCard 
+            ? 'bg-[#18181b]/95 border-white/5 shadow-2xl text-white' 
+            : 'bg-white/95 border-black/5 shadow-lg text-[var(--color-ink)]';
 
-          // Reverse text color logic for clear bento grid display
           const isDarkBg = blockColor === '#141414' || blockColor === '#DD400A';
-          const textColor = isDarkBg ? 'text-[var(--color-surface)]' : 'text-[var(--color-ink)]';
-          const descColor = isDarkBg ? 'text-[var(--color-surface)]/70' : 'text-[var(--color-muted)]';
+          const textColor = isDarkBg ? 'text-white' : 'text-[var(--color-ink)]';
+          const descColor = isDarkBg ? 'text-white/70' : 'text-[var(--color-muted)]';
 
           const cleanTextPreview = note.content
             ? note.content.replace(/<[^>]*>/g, ' ').substring(0, 120)
             : 'empty note...';
 
           const getResponsiveSpan = (span?: string) => {
-            if (!span) return 'col-span-1 row-span-1';
+            if (!span) return 'col-span-1';
             let classes = [];
             if (span.includes('col-span-2')) {
               classes.push('sm:col-span-2 col-span-1');
@@ -329,47 +323,51 @@ export default function NotesBundlesPage() {
             return classes.join(' ');
           };
 
+          const heightClass = note.gridSpan?.includes('row-span-2') 
+            ? 'h-[220px] sm:h-[588px]' 
+            : 'h-[220px] sm:h-[280px]';
+
           return (
             <Link
               key={note.id}
               href={`/notes/editor/${note.id}`}
-              className={`block transition-all duration-200 hover:scale-[1.01] ${getResponsiveSpan(note.gridSpan)}`}
+              className={`block transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass}`}
             >
-              <ParticleCard
-                glowColor={rgbColorString}
-                className="p-8 flex flex-col justify-between magic-bento-card magic-bento-card--border-glow rounded-[28px] overflow-hidden w-full h-full"
-                style={{ backgroundColor: cardBg, '--glow-color': rgbColorString } as any}
-                enableTilt={false}
-                clickEffect={true}
-                enableMagnetism={false}
-                particleCount={6}
-              >
+              <div className={`relative p-8 flex flex-col justify-between rounded-[28px] overflow-hidden w-full h-full border transition-all duration-300 ${cardBgClass}`}>
                 {/* Colored Glow Orb mimicking the Variant Aura visual style */}
                 <div 
-                  className="absolute top-[-30px] right-[-30px] w-32 h-32 rounded-full pointer-events-none opacity-45 z-0"
+                  className="absolute -top-12 -right-12 w-32 h-32 rounded-full pointer-events-none opacity-[0.15] z-0 animate-pulse duration-3000"
                   style={{ 
-                    background: isDarkCard 
-                      ? 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%)' 
-                      : `radial-gradient(circle, ${blockColor} 0%, transparent 70%)`,
-                    filter: 'blur(20px)'
+                    background: `radial-gradient(circle, ${blockColor} 0%, transparent 70%)`,
+                    filter: 'blur(12px)'
                   }}
                 />
-                <span className={`text-xs font-sans tracking-widest uppercase ${descColor} z-10`}>
-                  {bundle?.name || 'unsorted'}
-                </span>
-                <div className="mt-6 flex-grow flex flex-col justify-end z-10">
-                  <h3 className={`text-2xl font-serif not-italic font-normal ${textColor} truncate z-10`}>
-                    {note.title}
+                
+                {/* Top Info */}
+                <div className="flex justify-between items-start z-10 w-full">
+                  <span className={`text-[10px] font-sans font-semibold tracking-widest uppercase opacity-60 ${isDarkCard ? 'text-white' : 'text-[var(--color-ink)]'}`}>
+                    {bundle?.name || 'unsorted'}
+                  </span>
+                  <span 
+                    className="w-2.5 h-2.5 rounded-full shrink-0" 
+                    style={{ backgroundColor: blockColor }} 
+                  />
+                </div>
+
+                {/* Bottom Title & Content */}
+                <div className="mt-8 flex-grow flex flex-col justify-end z-10 w-full">
+                  <h3 className={`text-xl md:text-2xl font-serif font-semibold tracking-wide leading-snug line-clamp-2 ${isDarkCard ? 'text-white' : 'text-[var(--color-ink)]'}`}>
+                    {note.title || 'UNTITLED'}
                   </h3>
-                  <p className={`text-sm mt-2 line-clamp-3 font-serif ${descColor} z-10`}>
+                  <p className={`text-xs md:text-sm mt-3 line-clamp-3 font-serif opacity-75 leading-relaxed ${isDarkCard ? 'text-white/80' : 'text-[var(--color-muted)]'}`}>
                     {cleanTextPreview}
                   </p>
                 </div>
-              </ParticleCard>
+              </div>
             </Link>
           );
         })}
-      </BentoCardGrid>
+      </div>
 
       {/* FLOATING ACTION: ADD NOTE */}
       <div className="flex justify-center pt-12 pb-6 z-30">

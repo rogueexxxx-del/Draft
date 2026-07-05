@@ -77,29 +77,30 @@ export default function SignupPage() {
       {/* Generative WebGL crystal growth backdrop with Rust theme (panel 1) */}
       <ShaderCanvas panel={1} theme="rust" opacity={1.0} />
 
-      <div className="w-full max-w-lg flex flex-col items-center space-y-16 z-10">
+      {/* Auth Card wrapped in glassmorphism panel */}
+      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10 bg-white/80 dark:bg-zinc-900/80 shadow-2xl">
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
           <img 
             src="/draft.svg" 
             alt="Draft" 
-            className="w-48 h-auto select-none brightness-0 invert"
+            className="w-40 h-auto select-none"
             draggable="false"
           />
-          <p className="text-base text-[var(--color-surface)] font-serif not-italic whitespace-nowrap mt-[-6px] opacity-90">
+          <p className="text-xs text-[var(--color-muted)] font-serif not-italic mt-[-2px]">
             start with one idea.
           </p>
         </div>
 
-        <form onSubmit={handleSignup} className="w-full flex flex-col space-y-4 max-w-sm">
+        <form onSubmit={handleSignup} className="w-full flex flex-col space-y-4">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="email"
             required
-            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-black focus:outline-none placeholder:text-center placeholder:text-black/40 placeholder:text-xs outline-none"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 outline-none transition-all"
           />
           <input 
             type="password"
@@ -107,7 +108,7 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="password"
             required
-            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-black focus:outline-none placeholder:text-center placeholder:text-black/40 placeholder:text-xs outline-none"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 outline-none transition-all"
           />
           <input
             type="password"
@@ -115,29 +116,31 @@ export default function SignupPage() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="confirm password"
             required
-            className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel text-black focus:outline-none placeholder:text-center placeholder:text-black/40 placeholder:text-xs outline-none"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 outline-none transition-all"
           />
           
-          {error && <p className="text-red-300 glass-panel-dark px-3 py-1.5 text-xs text-center rounded-full">{error}</p>}
+          {error && <div className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
           
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-[35px] rounded-full glass-panel-dark text-[var(--color-surface)] uppercase font-bold tracking-widest hover:scale-[1.02] disabled:opacity-50 transition-all text-xs"
+            className="w-full h-11 rounded-2xl bg-[var(--color-ink)] text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity text-xs mt-2"
           >
             {loading ? 'processing...' : 'sign up'}
           </button>
         </form>
 
+        <div className="w-full border-t border-black/5 dark:border-white/5" />
+
         {/* SECONDARY ACTIONS */}
-        <div className="flex flex-col items-center space-y-3 text-sm text-[var(--color-surface)]">
+        <div className="flex flex-col items-center space-y-3 text-xs text-[var(--color-ink)] w-full">
           <div>
-            already in — <Link href="/login" className="underline hover:opacity-75 transition-opacity">log in</Link>
+            already in? — <Link href="/login" className="underline hover:opacity-75 transition-opacity font-bold">log in</Link>
           </div>
           <button
             type="button"
             onClick={handleGuestMode}
-            className="underline hover:opacity-75 transition-opacity bg-transparent border-none p-0 cursor-pointer font-normal text-sm text-[var(--color-surface)]"
+            className="underline hover:opacity-75 transition-opacity bg-transparent border-none p-0 cursor-pointer font-medium text-xs"
           >
             try it without an account
           </button>

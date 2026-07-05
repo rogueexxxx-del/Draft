@@ -78,7 +78,7 @@ export default function WelcomePage() {
 
       {/* Hero Composition */}
       <div className="z-10 flex flex-col items-center text-center space-y-16 max-w-full">
-        <div className="relative flex flex-col items-center w-[360px] sm:w-[480px] md:w-[620px]">
+        <div className="relative flex flex-col items-center w-[290px] sm:w-[440px] md:w-[580px]">
           {/* Wordmark "Draft" */}
           <img 
             src="/draft.svg" 
@@ -88,13 +88,13 @@ export default function WelcomePage() {
           />
 
           {/* Tagline: Two separate, independently positioned fragments */}
-          <div className="w-full flex justify-between mt-[-10px] sm:mt-[-20px] md:mt-[-32px] px-2 font-serif not-italic text-xl sm:text-2xl md:text-3xl text-[var(--color-ink)]">
+          <div className="w-full flex justify-between mt-[-4px] sm:mt-[-12px] md:mt-[-20px] px-1.5 font-serif not-italic text-[11px] sm:text-[15px] md:text-xl text-[var(--color-ink)]">
             {/* Left fragment: positioned left-aligned under "Dra" */}
-            <span className="text-left w-[45%] leading-none whitespace-nowrap pl-2 sm:pl-0">
+            <span className="text-left w-[47%] leading-none whitespace-nowrap pl-1 sm:pl-0">
               a <span className="italic">f</span>ocused centered
             </span>
             {/* Right fragment: positioned right-aligned under "ft" */}
-            <span className="text-right w-[45%] leading-none whitespace-nowrap pr-8 sm:pr-0">
+            <span className="text-right w-[47%] leading-none whitespace-nowrap pr-2.5 sm:pr-0">
               creative tool
             </span>
           </div>
