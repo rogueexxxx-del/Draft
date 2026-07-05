@@ -460,16 +460,17 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       />
 
       {/* CONTENT LAYER */}
-      <div className="relative z-10 w-full flex-grow flex flex-col py-12 px-12 md:px-24">
+      <div className="relative z-10 w-full flex-grow flex flex-col py-12 px-6 sm:px-12 md:px-24">
         
         {/* Top Bar / Heading block */}
         <div className="flex justify-between items-center w-full mb-12 gap-4 relative z-40">
           {/* Back Arrow link on Left */}
           <Link 
             href="/notes" 
-            className={`hover:opacity-75 transition-opacity no-print shrink-0 ${textColor}`}
+            className={`hover:opacity-75 transition-opacity no-print shrink-0 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${textColor}`}
+            title="Back to notes"
           >
-            <ArrowLeft size={24} strokeWidth={1.5} />
+            <ArrowLeft size={20} strokeWidth={1.5} />
           </Link>
 
           {/* Centered Title input & Description info */}
@@ -497,9 +498,10 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           <div className="relative shrink-0 no-print">
             <button 
               onClick={() => setShowMenu(!showMenu)} 
-              className={`hover:opacity-75 transition-opacity ${textColor}`}
+              className={`hover:opacity-75 transition-opacity p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${textColor}`}
+              title="Settings"
             >
-              <MoreHorizontal size={24} strokeWidth={1.5} />
+              <MoreHorizontal size={20} strokeWidth={1.5} />
             </button>
 
             {/* SETTINGS PANEL DROPDOWN */}
@@ -658,9 +660,9 @@ export default function EditorPage({ params }: { params: { id: string } }) {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 no-print">
           <button
             onClick={handleSave}
-            className={`flex items-center space-x-2 text-xl font-degraded not-italic hover:scale-105 transition-transform px-6 py-3 ${isDarkTheme ? 'glass-panel-dark' : 'glass-panel'}`}
+            className="text-xs font-sans tracking-widest uppercase hover:opacity-75 transition-all border border-black/15 dark:border-white/15 rounded-full px-5 py-2.5 font-medium glass-panel bg-white/40 dark:bg-black/40 shadow-xl backdrop-blur-md"
           >
-            <span>+ SAVE NOTE</span>
+            + Save Note
           </button>
         </div>
 
