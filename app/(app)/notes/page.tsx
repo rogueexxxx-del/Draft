@@ -26,6 +26,7 @@ interface Note {
 export default function NotesBundlesPage() {
   const router = useRouter();
   const [isCreateBundleOpen, setIsCreateBundleOpen] = useState(false);
+  const [userId, setUserId] = useState('guest-mock');
 
   // Form states for new bundle
   const [bundleName, setBundleName] = useState('');
@@ -62,10 +63,20 @@ export default function NotesBundlesPage() {
       const storedStars = localStorage.getItem('draft_starred_bundles');
       if (storedStars) setStarredBundles(JSON.parse(storedStars));
 
+      let activeUserId = 'guest-mock';
+      if (!isGuest) {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          activeUserId = user.id;
+          setUserId(user.id);
+        }
+      }
+
       const defaultBundles: Bundle[] = [
-        { id: 'unsorted', name: 'unsorted', description: 'default capture pool', color: '#D9D9D9' },
-        { id: 'feature-film', name: 'Feature Film', description: 'screenplay prep', color: '#DD400A' },
-        { id: 'journal', name: 'Journal', description: 'daily thoughts', color: '#141414' },
+        { id: `${activeUserId}-unsorted`, name: 'unsorted', description: 'default capture pool', color: '#D9D9D9' },
+        { id: `${activeUserId}-feature-film`, name: 'Feature Film', description: 'screenplay prep', color: '#DD400A' },
+        { id: `${activeUserId}-journal`, name: 'Journal', description: 'daily thoughts', color: '#141414' },
       ];
 
       const defaultNotes: Note[] = [];
@@ -158,7 +169,7 @@ export default function NotesBundlesPage() {
       id: newNoteId,
       title: 'Untitled',
       content: '',
-      bundleId: selectedBundleId || 'unsorted',
+      bundleId: selectedBundleId || `${userId}-unsorted`,
       updatedAt: new Date().toISOString().split('T')[0],
       gridSpan: Math.random() > 0.5 ? 'col-span-2 row-span-1' : 'col-span-1 row-span-1',
     };
@@ -171,13 +182,16 @@ export default function NotesBundlesPage() {
       localStorage.setItem('draft_notes', JSON.stringify(updatedNotes));
     } else {
       const supabase = createClient();
-      await supabase.from('notes').insert({
+      const { error } = await supabase.from('notes').insert({
         id: newNote.id,
         title: newNote.title,
         content: newNote.content,
         bundle_id: newNote.bundleId,
         grid_span: newNote.gridSpan,
       });
+      if (error) {
+        console.error("Failed to insert note:", error);
+      }
     }
 
     router.push(`/notes/editor/${newNoteId}`);

@@ -286,7 +286,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       }
     } else {
       const supabase = createClient();
-      await supabase
+      const { error } = await supabase
         .from('notes')
         .update({
           title,
@@ -296,6 +296,11 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           updated_at: new Date().toISOString(),
         })
         .eq('id', params.id);
+      if (error) {
+        console.error("Failed to save note:", error);
+        alert(`Failed to save note: ${error.message}`);
+        return;
+      }
     }
     alert('Note saved successfully!');
   };
