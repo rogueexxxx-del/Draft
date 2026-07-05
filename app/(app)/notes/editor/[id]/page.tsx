@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { toJpeg } from 'html-to-image';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import ShaderCanvas from '@/components/ShaderCanvas';
 
 // --- SLASH COMMAND EXTENSION ---
 const CommandList = forwardRef((props: any, ref) => {
@@ -434,6 +435,15 @@ export default function EditorPage({ params }: { params: { id: string } }) {
       ref={pageRef}
       className={`relative min-h-screen w-full flex flex-col font-degraded not-italic select-none transition-all duration-300 ${textColor}`}
     >
+      
+      {/* Generative background shader adaptively colored by note theme when no custom image is selected */}
+      {!themeBgImage && (
+        <ShaderCanvas 
+          panel={1} 
+          theme={themeBgColor === '#141414' ? 'dark' : themeBgColor === '#DD400A' ? 'rust' : 'light'} 
+          opacity={0.7} 
+        />
+      )}
       
       {/* BACKGROUND LAYER (Enables applying grayscale/saturate filter without affecting text inside) */}
       <div 
