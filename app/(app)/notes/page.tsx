@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import { Star, MoreHorizontal } from 'lucide-react';
+import { Star, MoreHorizontal, Filter, Menu } from 'lucide-react';
 import ShaderCanvas from '@/components/ShaderCanvas';
 
 interface Bundle {
@@ -223,18 +223,18 @@ export default function NotesBundlesPage() {
   });
 
   return (
-    <div className={`flex flex-col min-h-screen bg-transparent py-8 px-12 md:px-24 w-full relative select-none text-[var(--color-ink)]`}>
+    <div className={`flex flex-col min-h-screen bg-transparent py-8 px-6 sm:px-12 md:px-24 w-full relative select-none text-[var(--color-ink)]`}>
       {/* Soft Blurry Metaballs Shader Backdrop */}
       <ShaderCanvas panel={1} opacity={1.0} />
       
       {/* HEADER */}
-      <div className="flex justify-between items-start z-40 w-full relative">
+      <div className="flex justify-between items-center z-40 w-full relative">
         {/* Left Filter Dropdown */}
         <details className="group relative">
-          <summary className="list-none cursor-pointer font-degraded not-italic text-lg md:text-xl tracking-wider uppercase hover:opacity-75">
-            filter
+          <summary className="list-none cursor-pointer hover:opacity-75 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors [&::-webkit-details-marker]:hidden" title="Filter bundles">
+            <Filter size={20} strokeWidth={1.5} />
           </summary>
-          <div className="absolute left-0 top-10 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+          <div className="absolute left-0 top-11 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
             <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
               <button
                 onClick={() => setSelectedBundleId(null)}
@@ -261,16 +261,16 @@ export default function NotesBundlesPage() {
         </details>
 
         {/* Center Title */}
-        <h1 className="text-6xl md:text-7xl font-degraded italic tracking-tight leading-none mt-[-8px]">
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-degraded italic tracking-tight leading-none">
           notes
         </h1>
 
         {/* Right Menu Dropdown */}
         <details className="group relative">
-          <summary className="list-none cursor-pointer font-degraded not-italic text-lg md:text-xl tracking-wider uppercase hover:opacity-75">
-            menu
+          <summary className="list-none cursor-pointer hover:opacity-75 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors [&::-webkit-details-marker]:hidden" title="Menu options">
+            <Menu size={20} strokeWidth={1.5} />
           </summary>
-          <div className="absolute right-0 top-10 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+          <div className="absolute right-0 top-11 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
             <div className="flex flex-col space-y-4">
               <Link
                 href="/dashboard"
@@ -389,9 +389,9 @@ export default function NotesBundlesPage() {
       <div className="flex justify-center pt-12 pb-6 z-30">
         <button
           onClick={handleAddNote}
-          className="text-2xl font-serif not-italic hover:opacity-75 transition-all glass-panel px-8 py-4"
+          className="text-xs font-sans tracking-widest uppercase hover:opacity-75 transition-all border border-black/15 dark:border-white/15 rounded-full px-5 py-2.5 font-medium glass-panel"
         >
-          + <span className="italic">A</span>DD NOTE
+          + Add Note
         </button>
       </div>
 

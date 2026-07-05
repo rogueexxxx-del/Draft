@@ -5,7 +5,7 @@ import ShaderCanvas from '@/components/ShaderCanvas';
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen w-full bg-transparent flex flex-col justify-between p-12 sm:p-16 md:p-24 select-none relative overflow-hidden">
+    <main className="min-h-screen w-full bg-transparent flex flex-col justify-between p-6 sm:p-16 md:p-24 select-none relative overflow-hidden">
       
       {/* Generative WebGL backdrop study */}
       <ShaderCanvas panel={0} opacity={1.0} />

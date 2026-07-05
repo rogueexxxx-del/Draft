@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import ShaderCanvas from '@/components/ShaderCanvas';
+import { Menu } from 'lucide-react';
 
 export default function YouPage() {
   const router = useRouter();
@@ -56,7 +57,7 @@ export default function YouPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-transparent py-12 px-12 md:px-24 flex flex-col items-center justify-between select-none font-degraded not-italic text-[var(--color-ink)]">
+    <div className="relative min-h-screen w-full bg-transparent py-12 px-6 sm:px-12 md:px-24 flex flex-col items-center justify-between select-none font-degraded not-italic text-[var(--color-ink)]">
       {/* Soft Blurry Metaballs Shader Backdrop */}
       <ShaderCanvas panel={1} opacity={1.0} />
       
@@ -67,15 +68,13 @@ export default function YouPage() {
           <span className="italic">y</span>ou
         </h1>
 
-        {/* Right Hamburger icon linking back to Dashboard */}
+        {/* Right Menu icon linking back to Dashboard */}
         <Link 
           href="/dashboard" 
-          className="absolute right-0 top-3 flex flex-col space-y-1.5 justify-center items-center group cursor-pointer"
+          className="absolute right-0 top-3 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
           title="Back to Dashboard"
         >
-          <span className="w-6 h-[2px] bg-[var(--color-ink)] transition-transform duration-200 group-hover:scale-x-75" />
-          <span className="w-6 h-[2px] bg-[var(--color-ink)]" />
-          <span className="w-6 h-[2px] bg-[var(--color-ink)] transition-transform duration-200 group-hover:scale-x-75" />
+          <Menu size={20} />
         </Link>
       </div>
 
