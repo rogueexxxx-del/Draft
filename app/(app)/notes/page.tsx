@@ -27,6 +27,8 @@ export default function NotesBundlesPage() {
   const router = useRouter();
   const [isCreateBundleOpen, setIsCreateBundleOpen] = useState(false);
   const [userId, setUserId] = useState('guest-mock');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Form states for new bundle
   const [bundleName, setBundleName] = useState('');
@@ -244,35 +246,53 @@ export default function NotesBundlesPage() {
       {/* HEADER */}
       <div className="flex justify-between items-center z-40 w-full relative">
         {/* Left Filter Dropdown */}
-        <details className="group relative">
-          <summary className="list-none cursor-pointer hover:opacity-75 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors [&::-webkit-details-marker]:hidden" title="Filter bundles">
+        <div className="relative">
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="hover:opacity-75 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-[var(--color-ink)]"
+            title="Filter bundles"
+          >
             <Filter size={20} strokeWidth={1.5} />
-          </summary>
-          <div className="absolute left-0 top-11 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
-            <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
-              <button
-                onClick={() => setSelectedBundleId(null)}
-                className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider ${!selectedBundleId ? 'bg-black/10 font-bold rounded-lg' : 'hover:bg-black/5 rounded-lg'}`}
-              >
-                <span className="italic">A</span>LL N<span className="italic">O</span>TES
-              </button>
-              {sortedBundles.map(b => (
-                <div key={b.id} className={`flex items-center justify-between hover:bg-black/5 rounded-lg px-3 py-1 ${selectedBundleId === b.id ? 'bg-black/10 font-bold' : ''}`}>
+          </button>
+          {isFilterOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-40 bg-transparent"
+                onClick={() => setIsFilterOpen(false)}
+              />
+              <div className="absolute left-0 top-11 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+                <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
                   <button
-                    onClick={() => setSelectedBundleId(b.id)}
-                    className="text-left py-1 font-degraded not-italic text-sm uppercase tracking-wider flex items-center space-x-2 flex-grow truncate"
+                    onClick={() => {
+                      setSelectedBundleId(null);
+                      setIsFilterOpen(false);
+                    }}
+                    className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider ${!selectedBundleId ? 'bg-black/10 font-bold rounded-lg' : 'hover:bg-black/5 rounded-lg'}`}
                   >
-                    <span className="w-2.5 h-2.5 shrink-0 rounded-full" style={{ backgroundColor: b.color }} />
-                    <span className="truncate">{b.name}</span>
+                    <span className="italic">A</span>LL N<span className="italic">O</span>TES
                   </button>
-                  <button onClick={(e) => toggleStar(b.id, e)} className="p-1 hover:scale-110 transition-transform">
-                    <Star size={14} className={starredBundles.includes(b.id) ? 'fill-current text-[var(--color-rust)]' : 'opacity-30'} />
-                  </button>
+                  {sortedBundles.map(b => (
+                    <div key={b.id} className={`flex items-center justify-between hover:bg-black/5 rounded-lg px-3 py-1 ${selectedBundleId === b.id ? 'bg-black/10 font-bold' : ''}`}>
+                      <button
+                        onClick={() => {
+                          setSelectedBundleId(b.id);
+                          setIsFilterOpen(false);
+                        }}
+                        className="text-left py-1 font-degraded not-italic text-sm uppercase tracking-wider flex items-center space-x-2 flex-grow truncate"
+                      >
+                        <span className="w-2.5 h-2.5 shrink-0 rounded-full" style={{ backgroundColor: b.color }} />
+                        <span className="truncate">{b.name}</span>
+                      </button>
+                      <button onClick={(e) => toggleStar(b.id, e)} className="p-1 hover:scale-110 transition-transform">
+                        <Star size={14} className={starredBundles.includes(b.id) ? 'fill-current text-[var(--color-rust)]' : 'opacity-30'} />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </details>
+              </div>
+            </>
+          )}
+        </div>
 
         {/* Center Title */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-degraded italic tracking-tight leading-none">
@@ -280,32 +300,49 @@ export default function NotesBundlesPage() {
         </h1>
 
         {/* Right Menu Dropdown */}
-        <details className="group relative">
-          <summary className="list-none cursor-pointer hover:opacity-75 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors [&::-webkit-details-marker]:hidden" title="Menu options">
+        <div className="relative">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="hover:opacity-75 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-[var(--color-ink)]"
+            title="Menu options"
+          >
             <Menu size={20} strokeWidth={1.5} />
-          </summary>
-          <div className="absolute right-0 top-11 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
-            <div className="flex flex-col space-y-4">
-              <Link
-                href="/dashboard"
-                className="font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
-              >
-                B<span className="italic">A</span>CK TO D<span className="italic">A</span>SHBOARD
-              </Link>
-              <button
-                onClick={() => setIsCreateBundleOpen(true)}
-                className="w-full text-left font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
-              >
-                CRE<span className="italic">A</span>TE NEW B<span className="italic">U</span>NDLE
-              </button>
-              <button
-                className="w-full text-left font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
-              >
-                EXP<span className="italic">O</span>RT <span className="italic">A</span>LL N<span className="italic">O</span>TES
-              </button>
-            </div>
-          </div>
-        </details>
+          </button>
+          {isMenuOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-40 bg-transparent"
+                onClick={() => setIsMenuOpen(false)}
+              />
+              <div className="absolute right-0 top-11 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+                <div className="flex flex-col space-y-4">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
+                  >
+                    B<span className="italic">A</span>CK TO D<span className="italic">A</span>SHBOARD
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setIsCreateBundleOpen(true);
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full text-left font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
+                  >
+                    CRE<span className="italic">A</span>TE NEW B<span className="italic">U</span>NDLE
+                  </button>
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full text-left font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
+                  >
+                    EXP<span className="italic">O</span>RT <span className="italic">A</span>LL N<span className="italic">O</span>TES
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* BENTO GRID OF NOTES */}
