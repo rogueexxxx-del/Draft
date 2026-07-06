@@ -86,9 +86,12 @@ export default function LoginPage() {
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
-          <h1 className="text-4xl text-[var(--color-ink)] font-bold tracking-widest uppercase font-degraded">
-            d<span className="italic">r</span>aft
-          </h1>
+          <img 
+            src="/draft.svg" 
+            alt="Draft" 
+            className="w-40 h-auto select-none"
+            draggable="false"
+          />
           <p className="text-xs text-[var(--color-muted)] font-serif not-italic mt-[-2px]">
             everything in one place.
           </p>
@@ -126,7 +129,7 @@ export default function LoginPage() {
             aria-label="Log in to your account"
             className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs mt-2"
           >
-            l<span className="italic">o</span>g <span className="italic">i</span>n
+            l<span className="italic">o</span>g in
           </button>
           
           <button 
@@ -135,7 +138,7 @@ export default function LoginPage() {
             aria-label="Sign in with Google"
             className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs"
           >
-            c<span className="italic">o</span>nt<span className="italic">i</span>nu<span className="italic">e</span> w<span className="italic">i</span>th g<span className="italic">o</span>o<span className="italic">g</span>l<span className="italic">e</span>
+            c<span className="italic">o</span>ntinue with g<span className="italic">o</span>ogle
           </button>
         </form>
 

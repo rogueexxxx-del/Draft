@@ -148,7 +148,7 @@ export default function YouPage() {
           <span className="text-sm tracking-widest text-[var(--color-muted)] uppercase">
             E<span className="italic">M</span>AIL
           </span>
-          <h2 className="text-xl md:text-2xl font-serif font-normal tracking-wide text-center uppercase break-all text-[var(--color-ink)]">
+          <h2 className="text-sm sm:text-base md:text-xl font-serif font-normal tracking-wide text-center uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-full px-2 text-[var(--color-ink)]">
             {email}
           </h2>
         </div>

@@ -96,10 +96,13 @@ export default function SignupPage() {
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
-          <h1 className="text-4xl text-white font-bold tracking-widest uppercase font-degraded">
-            d<span className="italic">r</span>aft
-          </h1>
-          <p className="text-xs text-white/60 font-serif not-italic mt-[-2px]">
+          <img 
+            src="/draft.svg" 
+            alt="Draft" 
+            className="w-40 h-auto select-none brightness-0 invert"
+            draggable="false"
+          />
+          <p className="text-xs text-white/60 font-serif not-italic mt-1">
             start with one idea.
           </p>
         </div>
@@ -151,7 +154,7 @@ export default function SignupPage() {
             aria-label="Create account"
             className="w-full h-11 rounded-2xl glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
           >
-            {loading ? 'processing...' : <>s<span className="italic">i</span>gn <span className="italic">u</span>p</>}
+            {loading ? 'processing...' : <>s<span className="italic">i</span>gn up</>}
           </button>
           
           <button 
@@ -160,7 +163,7 @@ export default function SignupPage() {
             aria-label="Sign up with Google"
             className="w-full h-11 rounded-2xl glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs"
           >
-            c<span className="italic">o</span>nt<span className="italic">i</span>nu<span className="italic">e</span> w<span className="italic">i</span>th g<span className="italic">o</span>o<span className="italic">g</span>l<span className="italic">e</span>
+            c<span className="italic">o</span>ntinue with g<span className="italic">o</span>ogle
           </button>
         </form>
 
