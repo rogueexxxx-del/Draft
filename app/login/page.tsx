@@ -61,9 +61,24 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      setError(error.message);
+    }
+  };
+
   return (
-    <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-transparent select-none relative overflow-hidden">
-      {/* Generative WebGL backdrop (panel 1) */}
+    <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-transparent select-none">
+      
+      {/* Generative backdrop panel */}
       <ShaderCanvas panel={1} opacity={1.0} />
 
       {/* Auth Card wrapped in glassmorphism panel */}
@@ -71,12 +86,9 @@ export default function LoginPage() {
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
-          <img 
-            src="/draft.svg" 
-            alt="Draft" 
-            className="w-40 h-auto select-none"
-            draggable="false"
-          />
+          <h1 className="text-4xl text-[var(--color-ink)] font-bold tracking-widest uppercase font-degraded">
+            d<span className="italic">r</span>aft
+          </h1>
           <p className="text-xs text-[var(--color-muted)] font-serif not-italic mt-[-2px]">
             everything in one place.
           </p>
@@ -115,6 +127,15 @@ export default function LoginPage() {
             className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs mt-2"
           >
             l<span className="italic">o</span>g <span className="italic">i</span>n
+          </button>
+          
+          <button 
+            type="button"
+            onClick={handleGoogleLogin}
+            aria-label="Sign in with Google"
+            className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs"
+          >
+            c<span className="italic">o</span>nt<span className="italic">i</span>nu<span className="italic">e</span> w<span className="italic">i</span>th g<span className="italic">o</span>o<span className="italic">g</span>l<span className="italic">e</span>
           </button>
         </form>
 

@@ -72,6 +72,20 @@ export default function SignupPage() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      setError(error.message);
+    }
+  };
+
   return (
     <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-transparent select-none relative overflow-hidden">
       {/* Generative WebGL crystal growth backdrop with Rust theme (panel 1) */}
@@ -82,12 +96,9 @@ export default function SignupPage() {
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
-          <img 
-            src="/draft.svg" 
-            alt="Draft" 
-            className="w-40 h-auto select-none"
-            draggable="false"
-          />
+          <h1 className="text-4xl text-[var(--color-ink)] font-bold tracking-widest uppercase font-degraded">
+            d<span className="italic">r</span>aft
+          </h1>
           <p className="text-xs text-[var(--color-muted)] font-serif not-italic mt-[-2px]">
             start with one idea.
           </p>
@@ -141,6 +152,15 @@ export default function SignupPage() {
             className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
           >
             {loading ? 'processing...' : <>s<span className="italic">i</span>gn <span className="italic">u</span>p</>}
+          </button>
+          
+          <button 
+            type="button"
+            onClick={handleGoogleLogin}
+            aria-label="Sign up with Google"
+            className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs"
+          >
+            c<span className="italic">o</span>nt<span className="italic">i</span>nu<span className="italic">e</span> w<span className="italic">i</span>th g<span className="italic">o</span>o<span className="italic">g</span>l<span className="italic">e</span>
           </button>
         </form>
 
