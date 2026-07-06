@@ -100,6 +100,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+button, input, textarea, select {
+  font-family: inherit;
+}
+
 
 
 /* Tiptap Placeholder Styling */
@@ -303,4 +307,28 @@ body {
 }
 .glass-btn:active {
   transform: scale(0.98);
+}
+
+/* Glass Input Utility to guarantee webkit/mobile safari support */
+.glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: var(--color-ink);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.dark .glass-input,
+:global(.dark) .glass-input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(221, 64, 10, 0.5); /* color-rust */
+}
+.dark .glass-input:focus,
+:global(.dark) .glass-input:focus {
+  background: rgba(255, 255, 255, 0.08);
 }

@@ -88,24 +88,24 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="email"
+            placeholder="EMAIL"
             required
             aria-label="Email address"
             autoComplete="email"
             data-testid="login-email"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           <input 
             id="login-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="password"
+            placeholder="PASSWORD"
             required
             aria-label="Password"
             autoComplete="current-password"
             data-testid="login-password"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           {error && <div role="alert" aria-live="polite" className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
           <button 
