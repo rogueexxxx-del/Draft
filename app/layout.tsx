@@ -34,12 +34,32 @@ export default function RootLayout({
           type="font/otf"
           crossOrigin="anonymous"
         />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="min-h-full flex flex-col relative">
         {/* Global Analog Grain Overlay Layer */}
         <div className="grain-overlay no-print" />
 
         <ToastProvider>{children}</ToastProvider>
+
+        {/* Register custom service worker client-side */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                    console.log('ServiceWorker registration successful with scope: ', reg.scope);
+                  }, function(err) {
+                    console.warn('ServiceWorker registration failed: ', err);
+                  });
+                });
+              }
+            `
+          }}
+        />
       </body>
     </html>
   );
