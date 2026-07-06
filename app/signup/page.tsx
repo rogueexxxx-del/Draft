@@ -92,14 +92,14 @@ export default function SignupPage() {
       <ShaderCanvas panel={1} theme="rust" opacity={1.0} />
 
       {/* Auth Card wrapped in glassmorphism panel */}
-      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10">
+      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10 text-white border-white/10">
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
-          <h1 className="text-4xl text-[var(--color-ink)] font-bold tracking-widest uppercase font-degraded">
+          <h1 className="text-4xl text-white font-bold tracking-widest uppercase font-degraded">
             d<span className="italic">r</span>aft
           </h1>
-          <p className="text-xs text-[var(--color-muted)] font-serif not-italic mt-[-2px]">
+          <p className="text-xs text-white/60 font-serif not-italic mt-[-2px]">
             start with one idea.
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function SignupPage() {
             aria-label="Email address"
             autoComplete="email"
             data-testid="signup-email"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input text-white border-white/20 placeholder:text-white/50 focus:border-white/40 focus:outline-none outline-none transition-all"
           />
           <input 
             id="signup-password"
@@ -127,7 +127,7 @@ export default function SignupPage() {
             aria-label="Password"
             autoComplete="new-password"
             data-testid="signup-password"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input text-white border-white/20 placeholder:text-white/50 focus:border-white/40 focus:outline-none outline-none transition-all"
           />
           <input
             id="signup-confirm-password"
@@ -139,17 +139,17 @@ export default function SignupPage() {
             aria-label="Confirm password"
             autoComplete="new-password"
             data-testid="signup-confirm-password"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input text-white border-white/20 placeholder:text-white/50 focus:border-white/40 focus:outline-none outline-none transition-all"
           />
           
-          {error && <div role="alert" aria-live="polite" className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
+          {error && <div role="alert" aria-live="polite" className="text-red-200 bg-red-950/40 border border-red-900/50 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
           
           <button
             type="submit"
             disabled={loading}
             data-testid="signup-submit"
             aria-label="Create account"
-            className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
+            className="w-full h-11 rounded-2xl glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
           >
             {loading ? 'processing...' : <>s<span className="italic">i</span>gn <span className="italic">u</span>p</>}
           </button>
@@ -158,23 +158,23 @@ export default function SignupPage() {
             type="button"
             onClick={handleGoogleLogin}
             aria-label="Sign up with Google"
-            className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs"
+            className="w-full h-11 rounded-2xl glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs"
           >
             c<span className="italic">o</span>nt<span className="italic">i</span>nu<span className="italic">e</span> w<span className="italic">i</span>th g<span className="italic">o</span>o<span className="italic">g</span>l<span className="italic">e</span>
           </button>
         </form>
 
-        <div className="w-full border-t border-black/5 dark:border-white/5" />
+        <div className="w-full border-t border-white/10" />
 
         {/* SECONDARY ACTIONS */}
-        <div className="flex flex-col items-center space-y-3 text-xs text-[var(--color-ink)] w-full">
+        <div className="flex flex-col items-center space-y-3 text-xs text-white/80 w-full">
           <div>
-            already in? — <Link href="/login" className="underline hover:opacity-75 transition-opacity font-bold">log in</Link>
+            already in? — <Link href="/login" className="underline hover:text-white transition-colors font-bold text-white">log in</Link>
           </div>
           <button
             type="button"
             onClick={handleGuestMode}
-            className="underline hover:opacity-75 transition-opacity bg-transparent border-none p-0 cursor-pointer font-medium text-xs"
+            className="underline hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer font-medium text-xs text-white/80"
           >
             try it without an account
           </button>

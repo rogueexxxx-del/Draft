@@ -150,6 +150,23 @@ button, input, textarea, select {
     margin: 0 !important;
     padding: 3rem !important;
     font-family: 'RedactionDegraded', serif !important;
+    
+    /* Reset heights and layout structures for print context */
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Ensure all wrappers flow naturally without flex/height bounds */
+  main,
+  div[class*="min-h-"],
+  div[class*="flex-grow"] {
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    display: block !important;
   }
 
   input[type="text"] {

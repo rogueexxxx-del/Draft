@@ -461,7 +461,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   return (
     <div 
       ref={pageRef}
-      className={`relative min-h-[100dvh] w-full flex flex-col font-degraded not-italic select-none transition-all duration-300 ${textColor}`}
+      className={`relative min-h-[100dvh] w-full flex flex-col font-degraded not-italic transition-all duration-300 ${textColor}`}
     >
       
       {/* Generative background shader adaptively colored by note theme when no custom image is selected */}
@@ -690,7 +690,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
         {/* Editor Content wrapper (Full width, no squeeze) */}
         <div className="flex-grow w-full relative pt-4 pb-20">
-          <div className="glass-panel p-6 sm:p-10 min-h-[60vh]">
+          <div className="p-6 sm:p-10 min-h-[60vh]">
             <EditorContent editor={editor} />
           </div>
         </div>

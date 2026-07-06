@@ -19,6 +19,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <link
+          rel="preload"
+          href="/fonts/Redaction-Regular.otf"
+          as="font"
+          type="font/otf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/Redaction35-Regular.otf"
+          as="font"
+          type="font/otf"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="min-h-full flex flex-col relative">
         {/* Global Analog Grain Overlay Layer */}
         <div className="grain-overlay no-print" />
