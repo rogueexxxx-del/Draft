@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { Star, MoreHorizontal, Filter, Menu } from 'lucide-react';
 import ShaderCanvas from '@/components/ShaderCanvas';
+import IconButton from '@/components/ui/IconButton';
+import SkeletonCard from '@/components/ui/SkeletonCard';
 
 interface Bundle {
   id: string;
@@ -40,6 +42,7 @@ export default function NotesBundlesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedBundleId, setSelectedBundleId] = useState<string | null>(null);
   const [starredBundles, setStarredBundles] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -128,7 +131,7 @@ export default function NotesBundlesPage() {
       }
     };
 
-    loadData();
+    loadData().finally(() => setLoading(false));
   }, []);
 
   const handleCreateBundle = async (e: React.FormEvent) => {
@@ -184,15 +187,16 @@ export default function NotesBundlesPage() {
       localStorage.setItem('draft_notes', JSON.stringify(updatedNotes));
     } else {
       const supabase = createClient();
+      // ponytail: omit bundle_id — FK constraint fails if bundle row doesn't exist yet. DB allows null.
       const { error } = await supabase.from('notes').insert({
         id: newNote.id,
         title: newNote.title,
         content: newNote.content,
-        bundle_id: newNote.bundleId,
         grid_span: newNote.gridSpan,
       });
       if (error) {
         console.error("Failed to insert note:", error);
+        return; // Don't navigate to editor for a note that doesn't exist
       }
     }
 
@@ -239,7 +243,7 @@ export default function NotesBundlesPage() {
   });
 
   return (
-    <div className={`flex flex-col min-h-screen bg-transparent py-8 px-6 sm:px-12 md:px-24 w-full relative select-none text-[var(--color-ink)]`}>
+    <div className={`flex flex-col min-h-[100dvh] bg-transparent py-8 px-6 sm:px-12 md:px-24 w-full relative select-none text-[var(--color-ink)]`}>
       {/* Soft Blurry Metaballs Shader Backdrop */}
       <ShaderCanvas panel={1} opacity={1.0} />
       
@@ -247,13 +251,15 @@ export default function NotesBundlesPage() {
       <div className="flex justify-between items-center z-40 w-full relative">
         {/* Left Filter Dropdown */}
         <div className="relative">
-          <button
+          <IconButton
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="hover:opacity-75 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-[var(--color-ink)]"
-            title="Filter bundles"
+            aria-label="Filter bundles"
+            aria-expanded={isFilterOpen}
+            data-testid="filter-button"
+            className="text-[var(--color-ink)]"
           >
             <Filter size={20} strokeWidth={1.5} />
-          </button>
+          </IconButton>
           {isFilterOpen && (
             <>
               <div
@@ -301,13 +307,15 @@ export default function NotesBundlesPage() {
 
         {/* Right Menu Dropdown */}
         <div className="relative">
-          <button
+          <IconButton
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="hover:opacity-75 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-[var(--color-ink)]"
-            title="Menu options"
+            aria-label="Menu options"
+            aria-expanded={isMenuOpen}
+            data-testid="menu-button"
+            className="text-[var(--color-ink)]"
           >
             <Menu size={20} strokeWidth={1.5} />
-          </button>
+          </IconButton>
           {isMenuOpen && (
             <>
               <div
@@ -347,7 +355,20 @@ export default function NotesBundlesPage() {
 
       {/* BENTO GRID OF NOTES */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-16 flex-grow content-start w-full z-20">
-        {filteredNotes.map((note) => {
+        {/* Loading skeletons */}
+        {loading && [0,1,2,3,4,5].map(i => (
+          <SkeletonCard key={`skel-${i}`} className="h-[220px] sm:h-[280px] col-span-1" />
+        ))}
+
+        {/* Empty state */}
+        {!loading && filteredNotes.length === 0 && (
+          <div className="col-span-full flex flex-col items-center justify-center py-24 text-center">
+            <p className="text-lg font-serif opacity-40">No notes yet</p>
+            <p className="text-sm text-[var(--color-muted)] mt-2 opacity-60">Tap "+ Add Note" below to create your first note</p>
+          </div>
+        )}
+
+        {!loading && filteredNotes.map((note, index) => {
           const bundle = bundles.find(b => b.id === note.bundleId);
           const blockColor = bundle?.color || '#D9D9D9';
           
@@ -387,7 +408,10 @@ export default function NotesBundlesPage() {
           return (
             <div
               key={note.id}
-              className={`relative group rounded-[28px] overflow-hidden border transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass} ${cardBgClass}`}
+              className={`animate-stagger-fade relative group rounded-[28px] overflow-hidden border transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass} ${cardBgClass}`}
+              style={{ animationDelay: `${index * 60}ms` }}
+              aria-label={`Open note: ${note.title || 'Untitled'}`}
+              data-testid={`note-card-${note.id}`}
             >
               {/* Card content linking to editor */}
               <Link
@@ -440,9 +464,11 @@ export default function NotesBundlesPage() {
       <div className="flex justify-center pt-12 pb-6 z-30">
         <button
           onClick={handleAddNote}
-          className="text-xs font-sans tracking-widest uppercase hover:opacity-75 transition-all border border-black/15 dark:border-white/15 rounded-full px-5 py-2.5 font-medium glass-panel"
+          aria-label="Create new note"
+          data-testid="add-note-button"
+          className="text-xs font-sans tracking-widest uppercase rounded-full px-5 py-2.5 font-medium glass-btn"
         >
-          + Add Note
+          + A<span className="italic">d</span>d N<span className="italic">o</span>te
         </button>
       </div>
 
@@ -486,13 +512,13 @@ export default function NotesBundlesPage() {
                   onClick={() => setIsCreateBundleOpen(false)}
                   className="font-degraded not-italic text-sm uppercase tracking-wider hover:opacity-75"
                 >
-                  Cancel
+                  C<span className="italic">a</span>n<span className="italic">c</span>el
                 </button>
                 <button
                   type="submit"
                   className="font-degraded font-bold text-sm uppercase tracking-wider hover:opacity-75"
                 >
-                  Create
+                  C<span className="italic">r</span>e<span className="italic">a</span>te
                 </button>
               </div>
             </form>
@@ -515,12 +541,13 @@ function CardMenu({ noteId, isDarkCard, onDelete }: { noteId: string; isDarkCard
           e.preventDefault();
           setOpen(!open);
         }}
-        className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-60 hover:opacity-100 ${
+        className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-40 hover:opacity-100 ${
           isDarkCard ? 'text-white' : 'text-[var(--color-ink)]'
         }`}
-        title="Note options"
+        aria-label="Note options"
+        data-testid={`note-menu-${noteId}`}
       >
-        <MoreHorizontal size={18} />
+        <MoreHorizontal size={18} aria-hidden="true" />
       </button>
 
       {open && (

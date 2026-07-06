@@ -62,12 +62,12 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-transparent select-none relative overflow-hidden">
+    <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-transparent select-none relative overflow-hidden">
       {/* Generative WebGL backdrop (panel 1) */}
       <ShaderCanvas panel={1} opacity={1.0} />
 
       {/* Auth Card wrapped in glassmorphism panel */}
-      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10 bg-white/80 dark:bg-zinc-900/80 shadow-2xl">
+      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10">
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
@@ -84,27 +84,37 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="w-full flex flex-col space-y-4">
           <input 
+            id="login-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="email"
             required
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            aria-label="Email address"
+            autoComplete="email"
+            data-testid="login-email"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           <input 
+            id="login-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="password"
             required
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            aria-label="Password"
+            autoComplete="current-password"
+            data-testid="login-password"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
-          {error && <div className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
+          {error && <div role="alert" aria-live="polite" className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
           <button 
-            type="submit" 
-            className="w-full h-11 rounded-2xl bg-[var(--color-ink)] text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 transition-opacity text-xs mt-2"
+            type="submit"
+            data-testid="login-submit"
+            aria-label="Log in to your account"
+            className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs mt-2"
           >
-            login
+            l<span className="italic">o</span>g <span className="italic">i</span>n
           </button>
         </form>
 
@@ -118,6 +128,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleGuestMode}
+            data-testid="guest-mode-button"
             className="underline hover:opacity-75 transition-opacity bg-transparent border-none p-0 cursor-pointer font-medium text-xs"
           >
             try it without an account

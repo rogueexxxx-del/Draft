@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ToastProvider } from '@/components/ui/Toast';
 
 export const metadata: Metadata = {
   title: "Draft",
@@ -22,7 +23,7 @@ export default function RootLayout({
         {/* Global Analog Grain Overlay Layer */}
         <div className="grain-overlay no-print" />
 
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

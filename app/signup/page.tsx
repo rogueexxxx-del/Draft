@@ -73,12 +73,12 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-transparent select-none relative overflow-hidden">
+    <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-transparent select-none relative overflow-hidden">
       {/* Generative WebGL crystal growth backdrop with Rust theme (panel 1) */}
       <ShaderCanvas panel={1} theme="rust" opacity={1.0} />
 
       {/* Auth Card wrapped in glassmorphism panel */}
-      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10 bg-white/80 dark:bg-zinc-900/80 shadow-2xl">
+      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10">
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
@@ -95,38 +95,52 @@ export default function SignupPage() {
 
         <form onSubmit={handleSignup} className="w-full flex flex-col space-y-4">
           <input
+            id="signup-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="email"
             required
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            aria-label="Email address"
+            autoComplete="email"
+            data-testid="signup-email"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           <input 
+            id="signup-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="password"
             required
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            aria-label="Password"
+            autoComplete="new-password"
+            data-testid="signup-password"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           <input
+            id="signup-confirm-password"
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="confirm password"
             required
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            aria-label="Confirm password"
+            autoComplete="new-password"
+            data-testid="signup-confirm-password"
+            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal bg-zinc-50 border border-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
           />
           
-          {error && <div className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
+          {error && <div role="alert" aria-live="polite" className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
           
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-11 rounded-2xl bg-[var(--color-ink)] text-[var(--color-surface)] uppercase font-bold tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity text-xs mt-2"
+            data-testid="signup-submit"
+            aria-label="Create account"
+            className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
           >
-            {loading ? 'processing...' : 'sign up'}
+            {loading ? 'processing...' : <>s<span className="italic">i</span>gn <span className="italic">u</span>p</>}
           </button>
         </form>
 

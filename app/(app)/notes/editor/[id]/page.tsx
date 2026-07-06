@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { toJpeg } from 'html-to-image';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import IconButton from '@/components/ui/IconButton';
 import ShaderCanvas from '@/components/ShaderCanvas';
 
 // --- SLASH COMMAND EXTENSION ---
@@ -136,6 +137,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const [description, setDescription] = useState('');
   const [showMenu, setShowMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [isExporting, setIsExporting] = useState(false);
 
   // Reference for capturing screenshot / JPG
   const pageRef = useRef<HTMLDivElement>(null);
@@ -258,6 +261,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   }, [noteId, editor]);
 
   const handleSave = async () => {
+    setSaveStatus('saving');
     const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
     const contentHtml = editor?.getHTML() || '';
     const themeSettings = {
@@ -269,9 +273,11 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
     if (isGuest) {
       const localNotes = localStorage.getItem('draft_notes');
-      if (localNotes) {
-        const notesList = JSON.parse(localNotes);
-        const updated = notesList.map((n: any) => 
+      const notesList: any[] = localNotes ? JSON.parse(localNotes) : [];
+      const noteExists = notesList.some((n: any) => n.id === noteId);
+      let updated;
+      if (noteExists) {
+        updated = notesList.map((n: any) => 
           n.id === noteId 
             ? { 
                 ...n, 
@@ -283,8 +289,20 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
               } 
             : n
         );
-        localStorage.setItem('draft_notes', JSON.stringify(updated));
+      } else {
+        // Note wasn't in localStorage yet — add it
+        updated = [...notesList, {
+          id: noteId,
+          title,
+          description,
+          content: contentHtml,
+          theme_settings: themeSettings,
+          bundleId: 'guest-mock-unsorted',
+          updatedAt: new Date().toISOString().split('T')[0],
+          gridSpan: 'col-span-1 row-span-1',
+        }];
       }
+      localStorage.setItem('draft_notes', JSON.stringify(updated));
     } else {
       const supabase = createClient();
       const { error } = await supabase
@@ -299,11 +317,13 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         .eq('id', noteId);
       if (error) {
         console.error("Failed to save note:", error);
-        alert(`Failed to save note: ${error.message}`);
+        setSaveStatus('error');
+        setTimeout(() => setSaveStatus('idle'), 3000);
         return;
       }
     }
-    alert('Note saved successfully!');
+    setSaveStatus('saved');
+    setTimeout(() => setSaveStatus('idle'), 2000);
   };
 
   const handleDelete = async () => {
@@ -353,18 +373,13 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const handleExportJPG = async () => {
     setShowMenu(false);
     if (!pageRef.current) return;
+    setIsExporting(true);
+    // Let state changes render (background attachment changed to scroll so html-to-image captures it)
+    await new Promise((resolve) => setTimeout(resolve, 150));
     try {
       const dataUrl = await toJpeg(pageRef.current, {
         quality: 0.98,
-        skipFonts: true,
         filter: (node) => !node.classList?.contains('no-print'),
-        // @ts-expect-error styleSheetFilter is not in Options type but works at runtime
-        styleSheetFilter: () => false,
-        style: {
-          backgroundAttachment: 'scroll',
-          backgroundBlendMode: themeBgImage ? themeBlendMode : 'normal',
-          filter: themeBgImage ? getFilterStyle() : 'none',
-        }
       });
 
       const link = document.createElement('a');
@@ -373,6 +388,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
       link.click();
     } catch (error) {
       console.error('Oops, something went wrong with JPG export!', error);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -444,7 +461,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   return (
     <div 
       ref={pageRef}
-      className={`relative min-h-screen w-full flex flex-col font-degraded not-italic select-none transition-all duration-300 ${textColor}`}
+      className={`relative min-h-[100dvh] w-full flex flex-col font-degraded not-italic select-none transition-all duration-300 ${textColor}`}
     >
       
       {/* Generative background shader adaptively colored by note theme when no custom image is selected */}
@@ -464,7 +481,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
           backgroundImage: themeBgImage ? `url(${themeBgImage})` : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
+          backgroundAttachment: isExporting ? 'scroll' : 'fixed',
           backgroundBlendMode: themeBgImage ? (themeBlendMode as any) : 'normal',
           filter: themeBgImage ? getFilterStyle() : 'none',
         }}
@@ -476,12 +493,15 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         {/* Top Bar / Heading block */}
         <div className="flex justify-between items-center w-full mb-12 gap-4 relative z-40">
           {/* Back Arrow link on Left */}
-          <Link 
-            href="/notes" 
-            className={`hover:opacity-75 transition-opacity no-print shrink-0 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${textColor}`}
-            title="Back to notes"
-          >
-            <ArrowLeft size={20} strokeWidth={1.5} />
+          <Link href="/notes" className="no-print shrink-0">
+            <IconButton
+              onClick={() => {}}
+              aria-label="Back to notes"
+              data-testid="editor-back"
+              className={textColor}
+            >
+              <ArrowLeft size={20} strokeWidth={1.5} />
+            </IconButton>
           </Link>
 
           {/* Centered Title input & Description info */}
@@ -492,7 +512,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="UNTITLED"
-              className={`w-full text-center bg-transparent border-none outline-none text-2xl sm:text-4xl md:text-5xl font-bold uppercase tracking-wider bg-none focus:ring-0 ${textColor} ${placeholderColor} min-w-0`}
+              aria-label="Note title"
+              data-testid="editor-title"
+              className={`w-full text-center bg-transparent border-none outline-none text-2xl sm:text-4xl md:text-5xl font-bold uppercase tracking-wider bg-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] rounded-lg ${textColor} ${placeholderColor} min-w-0`}
             />
 
             {/* Description input */}
@@ -501,19 +523,23 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="ADD DESCRIPTION"
-              className={`w-full text-center bg-transparent border-none outline-none text-xs sm:text-sm mt-1.5 uppercase tracking-wide focus:ring-0 font-serif ${mutedTextColor} ${placeholderColor} min-w-0`}
+              aria-label="Note description"
+              data-testid="editor-description"
+              className={`w-full text-center bg-transparent border-none outline-none text-xs sm:text-sm mt-1.5 uppercase tracking-wide focus:ring-0 focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] rounded-lg font-serif ${mutedTextColor} ${placeholderColor} min-w-0`}
             />
           </div>
 
           {/* Settings Hamburger Button on Right */}
           <div className="relative shrink-0 no-print">
-            <button 
+            <IconButton
               onClick={() => setShowMenu(!showMenu)} 
-              className={`hover:opacity-75 transition-opacity p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${textColor}`}
-              title="Settings"
+              aria-label="Note settings"
+              aria-expanded={showMenu}
+              data-testid="editor-settings"
+              className={textColor}
             >
               <MoreHorizontal size={20} strokeWidth={1.5} />
-            </button>
+            </IconButton>
 
             {/* SETTINGS PANEL DROPDOWN */}
             {showMenu && (
@@ -664,18 +690,27 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
         {/* Editor Content wrapper (Full width, no squeeze) */}
         <div className="flex-grow w-full relative pt-4 pb-20">
-          <div className="glass-panel p-6 sm:p-10 min-h-[60vh] bg-white/70 dark:bg-black/70 shadow-inner border border-black/5 dark:border-white/5 rounded-3xl">
+          <div className="glass-panel p-6 sm:p-10 min-h-[60vh]">
             <EditorContent editor={editor} />
           </div>
         </div>
 
-        {/* Save Button */}
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 no-print">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 no-print flex items-center gap-3">
           <button
             onClick={handleSave}
-            className="text-xs font-sans tracking-widest uppercase hover:opacity-75 transition-all border border-black/15 dark:border-white/15 rounded-full px-5 py-2.5 font-medium glass-panel bg-white/40 dark:bg-black/40 shadow-xl backdrop-blur-md"
+            aria-label="Save note"
+            data-testid="save-note-button"
+            className="text-xs font-sans tracking-widest uppercase rounded-full px-5 py-2.5 font-medium glass-btn"
           >
-            + Save Note
+            {saveStatus === 'saving' ? (
+              <>S<span className="italic">a</span>v<span className="italic">i</span>ng...</>
+            ) : saveStatus === 'saved' ? (
+              <>S<span className="italic">a</span>v<span className="italic">e</span>d</>
+            ) : saveStatus === 'error' ? (
+              <>E<span className="italic">r</span>r<span className="italic">o</span>r</>
+            ) : (
+              <>+ S<span className="italic">a</span>v<span className="italic">e</span> N<span className="italic">o</span>te</>
+            )}
           </button>
         </div>
 

@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import ShaderCanvas from '@/components/ShaderCanvas';
-import { Menu } from 'lucide-react';
+import IconButton from '@/components/ui/IconButton';
+import { Menu, RefreshCw, Trash2, LogOut, ChevronRight } from 'lucide-react';
 
 export default function YouPage() {
   const router = useRouter();
@@ -117,7 +118,7 @@ export default function YouPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-transparent py-12 px-6 sm:px-12 md:px-24 flex flex-col items-center justify-between select-none font-degraded not-italic text-[var(--color-ink)]">
+    <div className="relative min-h-[100dvh] w-full bg-transparent py-12 px-6 sm:px-12 md:px-24 flex flex-col items-center justify-between select-none font-degraded not-italic text-[var(--color-ink)]">
       {/* Soft Blurry Metaballs Shader Backdrop */}
       <ShaderCanvas panel={1} opacity={1.0} />
       
@@ -129,12 +130,14 @@ export default function YouPage() {
         </h1>
 
         {/* Right Menu icon linking back to Dashboard */}
-        <Link 
-          href="/dashboard" 
-          className="absolute right-0 top-3 flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-          title="Back to Dashboard"
-        >
-          <Menu size={20} />
+        <Link href="/dashboard" className="absolute right-0 top-0">
+          <IconButton
+            onClick={() => {}}
+            aria-label="Back to Dashboard"
+            data-testid="you-back"
+          >
+            <Menu size={20} />
+          </IconButton>
         </Link>
       </div>
 
@@ -152,31 +155,55 @@ export default function YouPage() {
 
         <div className="w-full border-t border-black/5 my-4" />
 
-        {/* Option Actions Column */}
-        <div className="flex flex-col items-center space-y-6 w-full">
-          {/* Sync */}
+        {/* HIG-style Settings Table Rows */}
+        <div className="flex flex-col w-full" role="list" aria-busy={syncing}>
+          {/* Sync Row */}
           <button
             onClick={handleSync}
             disabled={syncing}
-            className="text-xl font-serif not-italic hover:underline cursor-pointer tracking-wider text-[var(--color-ink)] disabled:opacity-50"
+            data-testid="sync-button"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-colors disabled:opacity-50 active:scale-[0.98]"
+            role="listitem"
           >
-            {syncing ? 'S Y N C I N G...' : <>S<span className="italic">Y</span>NC</>}
+            <div className="flex items-center gap-4">
+              <RefreshCw size={20} className={`text-[var(--color-ink)] ${syncing ? 'animate-spin' : ''}`} />
+              <span className="text-base font-serif not-italic tracking-wide text-[var(--color-ink)]">
+                {syncing ? <>S<span className="italic">y</span>nc<span className="italic">i</span>ng...</> : <>S<span className="italic">y</span>nc D<span className="italic">a</span>ta</>}
+              </span>
+            </div>
+            <ChevronRight size={16} className="text-[var(--color-muted)]" />
           </button>
 
-          {/* Delete Account */}
+          {/* Delete Account Row */}
           <button
             onClick={handleDeleteAccount}
-            className="text-xl font-serif not-italic hover:underline cursor-pointer tracking-wider text-red-600"
+            data-testid="delete-account-button"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-red-50 dark:hover:bg-red-950/20 rounded-2xl transition-colors active:scale-[0.98]"
+            role="listitem"
           >
-            D<span className="italic">E</span>L<span className="italic">E</span>TE <span className="italic">A</span>CCO<span className="italic">U</span>NT
+            <div className="flex items-center gap-4">
+              <Trash2 size={20} className="text-red-600" />
+              <span className="text-base font-serif not-italic tracking-wide text-red-600">
+                D<span className="italic">e</span>l<span className="italic">e</span>te A<span className="italic">c</span>c<span className="italic">o</span>unt
+              </span>
+            </div>
+            <ChevronRight size={16} className="text-red-400" />
           </button>
 
-          {/* Log Out */}
+          {/* Log Out Row */}
           <button
             onClick={handleLogout}
-            className="text-xl font-serif not-italic hover:underline cursor-pointer tracking-wider text-[var(--color-ink)]"
+            data-testid="logout-button"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-colors active:scale-[0.98]"
+            role="listitem"
           >
-            L<span className="italic">O</span>G <span className="italic">O</span>UT
+            <div className="flex items-center gap-4">
+              <LogOut size={20} className="text-[var(--color-ink)]" />
+              <span className="text-base font-serif not-italic tracking-wide text-[var(--color-ink)]">
+                L<span className="italic">o</span>g O<span className="italic">u</span>t
+              </span>
+            </div>
+            <ChevronRight size={16} className="text-[var(--color-muted)]" />
           </button>
         </div>
       </div>

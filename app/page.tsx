@@ -72,7 +72,7 @@ export default function WelcomePage() {
   if (!mounted) return null; // Avoid hydration mismatch
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-transparent select-none">
+    <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-transparent select-none">
       {/* Generative WebGL liquid waves background (panel 1) */}
       <ShaderCanvas panel={1} opacity={1.0} />
 
@@ -88,7 +88,7 @@ export default function WelcomePage() {
           />
 
           {/* Tagline: Two separate, independently positioned fragments */}
-          <div className="w-full flex justify-between mt-[-4px] sm:mt-[-12px] md:mt-[-20px] px-1.5 font-serif not-italic text-[11px] sm:text-[15px] md:text-xl text-[var(--color-ink)]">
+          <div className="w-full flex justify-between mt-[-14px] sm:mt-[-26px] md:mt-[-36px] px-1.5 font-serif not-italic text-[11px] sm:text-[15px] md:text-xl text-[var(--color-ink)]">
             {/* Left fragment: positioned left-aligned under "Dra" */}
             <span className="text-left w-[47%] leading-none whitespace-nowrap pl-1 sm:pl-0">
               a <span className="italic">f</span>ocused centered
@@ -103,9 +103,11 @@ export default function WelcomePage() {
         {/* CTA Button */}
         <button
           onClick={handleLetsGo}
-          className="px-12 py-4 bg-[var(--color-ink)] text-[var(--color-surface)] text-sm md:text-base uppercase tracking-widest font-bold rounded-none hover:opacity-90 transition-opacity"
+          aria-label="Enter Draft"
+          data-testid="welcome-cta"
+          className="px-12 py-4 glass-btn text-sm md:text-base uppercase tracking-widest font-bold rounded-full"
         >
-          let's go
+          l<span className="italic">e</span>t&apos;s g<span className="italic">o</span>
         </button>
       </div>
     </main>

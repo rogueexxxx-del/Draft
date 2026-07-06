@@ -51,6 +51,30 @@
   pointer-events: none;
 }
 
+/* Scroll reveal stagger animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-fade {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-stagger-fade {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 @theme {
   --color-rust: #DD400A;
   --color-ink: #141414;
@@ -99,7 +123,8 @@ body {
   .no-print,
   button,
   a,
-  hr {
+  hr,
+  .no-print * {
     display: none !important;
   }
 
@@ -109,21 +134,18 @@ body {
     print-color-adjust: exact !important;
   }
   
-  body, 
-  .min-h-screen {
+  html,
+  body {
     background-color: var(--theme-bg-color) !important;
     background-image: var(--theme-bg-image) !important;
     background-size: cover !important;
     background-position: center !important;
-    background-attachment: fixed !important;
+    background-attachment: scroll !important;
     background-blend-mode: var(--theme-blend-mode) !important;
     filter: var(--theme-filter) !important;
-  }
-
-  /* Wrap printing in internal page padding to act as the new margins */
-  body {
     margin: 0 !important;
     padding: 3rem !important;
+    font-family: 'RedactionDegraded', serif !important;
   }
 
   input[type="text"] {
@@ -144,31 +166,35 @@ body {
   }
 }
 
-/* Glassmorphism Utilities */
+/* Glassmorphism Utilities — Variant-inspired ultra-subtle glass */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(40px) saturate(1.2);
+  -webkit-backdrop-filter: blur(40px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
 }
 
 .glass-panel-dark {
-  background: rgba(20, 20, 20, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(40px) saturate(1.2);
+  -webkit-backdrop-filter: blur(40px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border-radius: 32px;
 }
 
 .glass-panel-color {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  border-radius: 28px;
+  backdrop-filter: blur(40px) saturate(1.2);
+  -webkit-backdrop-filter: blur(40px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border-radius: 32px;
 }
 
 /* Magic Bento Styles */
@@ -251,4 +277,30 @@ body {
 .bento-section {
   position: relative;
   user-select: none;
+}
+
+/* Glass Button Utility to guarantee webkit/mobile safari support */
+.glass-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: var(--color-ink);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+.dark .glass-btn,
+:global(.dark) .glass-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.glass-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.dark .glass-btn:hover,
+:global(.dark) .glass-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.glass-btn:active {
+  transform: scale(0.98);
 }
