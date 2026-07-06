@@ -156,7 +156,7 @@ function MenuItem({
 
   const content = (
     <span className="menu__item-link font-degraded italic" style={{ color: disabled ? 'var(--color-muted)' : textColor }}>
-      {formatText(text)}
+      {text}
     </span>
   );
 
@@ -188,11 +188,18 @@ function MenuItem({
         <div className="marquee" ref={marqueeRef} style={{ backgroundColor: marqueeBgColor }}>
           <div className="marquee__inner-wrap">
             <div className="marquee__inner" ref={marqueeInnerRef} aria-hidden="true">
-              {[...Array(repetitions)].map((_, idx) => (
-                <div className="marquee__part font-degraded italic" key={idx} style={{ color: marqueeTextColor }}>
-                  <span>{formatText(text)}</span>
-                </div>
-              ))}
+              {[...Array(repetitions)].map((_, idx) => {
+                const isItalic = idx % 2 === 1;
+                return (
+                  <div 
+                    className={`marquee__part font-degraded ${isItalic ? 'italic' : 'not-italic'}`} 
+                    key={idx} 
+                    style={{ color: marqueeTextColor }}
+                  >
+                    <span>{text}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

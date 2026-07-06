@@ -34,7 +34,8 @@
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
-  font-weight: 600;
+  font-weight: normal;
+  letter-spacing: -0.05em;
   font-size: 5vh;
   transition: opacity 0.2s ease;
 }
@@ -82,7 +83,8 @@
 .marquee span {
   white-space: nowrap;
   text-transform: uppercase;
-  font-weight: 400;
+  font-weight: normal;
+  letter-spacing: -0.05em;
   font-size: 5vh;
   line-height: 1;
   padding: 0 2vw;
