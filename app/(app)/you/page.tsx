@@ -162,7 +162,7 @@ export default function YouPage() {
             onClick={handleSync}
             disabled={syncing}
             data-testid="sync-button"
-            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-colors disabled:opacity-50 active:scale-[0.98]"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-black/5 dark:hover:bg-white/5 rounded-[2px] transition-colors disabled:opacity-50 active:scale-[0.98]"
             role="listitem"
           >
             <div className="flex items-center gap-4">
@@ -178,7 +178,7 @@ export default function YouPage() {
           <button
             onClick={handleDeleteAccount}
             data-testid="delete-account-button"
-            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-red-50 dark:hover:bg-red-950/20 rounded-2xl transition-colors active:scale-[0.98]"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-red-50 dark:hover:bg-red-950/20 rounded-[2px] transition-colors active:scale-[0.98]"
             role="listitem"
           >
             <div className="flex items-center gap-4">
@@ -194,7 +194,7 @@ export default function YouPage() {
           <button
             onClick={handleLogout}
             data-testid="logout-button"
-            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-colors active:scale-[0.98]"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-black/5 dark:hover:bg-white/5 rounded-[2px] transition-colors active:scale-[0.98]"
             role="listitem"
           >
             <div className="flex items-center gap-4">

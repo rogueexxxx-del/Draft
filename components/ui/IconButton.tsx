@@ -17,7 +17,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       <button
         ref={ref}
         {...props}
-        className={`inline-flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors active:scale-[0.96] ${className}`}
+        className={`inline-flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 rounded-[2px] hover:bg-black/5 dark:hover:bg-white/5 transition-colors active:scale-[0.96] ${className}`}
       >
         <span aria-hidden="true">{children}</span>
       </button>

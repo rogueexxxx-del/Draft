@@ -56,7 +56,7 @@ function ToastItem({ toast: t, onDismiss, onUndo }: { toast: ToastMessage; onDis
   }, [t.duration, onDismiss]);
 
   return (
-    <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200">
+    <div className="flex items-center gap-3 px-5 py-3 rounded-[2px] bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200">
       <span>{t.text}</span>
       {t.undoAction && (
         <button

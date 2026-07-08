@@ -189,39 +189,48 @@ button, input, textarea, select {
 
 /* Glassmorphism Utilities — Variant-inspired ultra-subtle glass */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(40px) saturate(1.2);
-  -webkit-backdrop-filter: blur(40px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  border-radius: 32px;
+  background: rgba(20, 20, 20, 0.45) !important; /* ink base */
+  background-image: url('/assets/grain-ink.jpg') !important;
+  background-blend-mode: overlay !important;
+  background-size: cover !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: 2px !important;
+  border: none !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.45) !important; /* white base for light screens */
+  background-image: url('/assets/grain-rust.jpg') !important;
+  background-blend-mode: overlay !important;
+  background-size: cover !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
 }
 
 .glass-panel-dark {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(40px) saturate(1.2);
-  -webkit-backdrop-filter: blur(40px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  border-radius: 32px;
+  background: rgba(20, 20, 20, 0.65) !important;
+  background-image: url('/assets/grain-ink.jpg') !important;
+  background-blend-mode: overlay !important;
+  background-size: cover !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: 2px !important;
+  border: none !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25) !important;
 }
 
 .glass-panel-color {
-  backdrop-filter: blur(40px) saturate(1.2);
-  -webkit-backdrop-filter: blur(40px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  border-radius: 32px;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: 2px !important;
+  border: none !important;
 }
 
 /* Magic Bento Styles */
 .magic-bento-card {
   position: relative;
-  border-radius: 28px;
+  border-radius: 2px !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(0, 0, 0, 0.03);
@@ -309,8 +318,7 @@ button, input, textarea, select {
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
   transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
 }
-.dark .glass-btn,
-:global(.dark) .glass-btn {
+.dark .glass-btn {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
@@ -318,8 +326,7 @@ button, input, textarea, select {
 .glass-btn:hover {
   background: rgba(255, 255, 255, 0.1);
 }
-.dark .glass-btn:hover,
-:global(.dark) .glass-btn:hover {
+.dark .glass-btn:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 .glass-btn:active {
@@ -335,8 +342,7 @@ button, input, textarea, select {
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
-.dark .glass-input,
-:global(.dark) .glass-input {
+.dark .glass-input {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
@@ -345,7 +351,33 @@ button, input, textarea, select {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(221, 64, 10, 0.5); /* color-rust */
 }
-.dark .glass-input:focus,
-:global(.dark) .glass-input:focus {
+.dark .glass-input:focus {
   background: rgba(255, 255, 255, 0.08);
+}
+
+.glass-input {
+  border-radius: 2px !important;
+}
+
+/* Decorative drifting squares animations */
+@keyframes idle-drift-1 {
+  0%, 100% { transform: translate(0, 0) rotate(12deg); }
+  50% { transform: translate(6px, -8px) rotate(15deg); }
+}
+@keyframes idle-drift-2 {
+  0%, 100% { transform: translate(0, 0) rotate(35deg); }
+  50% { transform: translate(-8px, 6px) rotate(32deg); }
+}
+@keyframes idle-drift-3 {
+  0%, 100% { transform: translate(0, 0) rotate(-15deg); }
+  50% { transform: translate(8px, 8px) rotate(-12deg); }
+}
+.animate-drift-1 {
+  animation: idle-drift-1 16s ease-in-out infinite;
+}
+.animate-drift-2 {
+  animation: idle-drift-2 20s ease-in-out infinite;
+}
+.animate-drift-3 {
+  animation: idle-drift-3 14s ease-in-out infinite;
 }

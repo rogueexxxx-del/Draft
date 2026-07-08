@@ -1,6 +1,6 @@
-# Draft — A Focused Centered Creative Tool
+# Draft — a focus-centered creative OS
 
-Draft is a minimalist, premium creative workspace and screenwriting prep tool built on Next.js 16 (App Router) and Tailwind CSS. It features WebGL-generative art backdrops, high-contrast typography hierarchy, interactive bento note grids, and a distraction-free Tiptap canvas.
+a focus-centered creative OS — notes, scrapbook, shot lists, and screenwriting in one distraction-free canvas.
 
 ---
 

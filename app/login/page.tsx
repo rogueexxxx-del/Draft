@@ -108,7 +108,7 @@ export default function LoginPage() {
             aria-label="Email address"
             autoComplete="email"
             data-testid="login-email"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-[2px] text-center text-sm font-normal bg-[#D9D9D9] text-[#141414] border-none outline-none placeholder:text-zinc-500 transition-all focus-visible:ring-2 focus-visible:ring-[#DD400A]"
           />
           <input 
             id="login-password"
@@ -120,14 +120,14 @@ export default function LoginPage() {
             aria-label="Password"
             autoComplete="current-password"
             data-testid="login-password"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-[2px] text-center text-sm font-normal bg-[#D9D9D9] text-[#141414] border-none outline-none placeholder:text-zinc-500 transition-all focus-visible:ring-2 focus-visible:ring-[#DD400A]"
           />
-          {error && <div role="alert" aria-live="polite" className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
+          {error && <div role="alert" aria-live="polite" className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-[2px] font-medium">{error}</div>}
           <button 
             type="submit"
             data-testid="login-submit"
             aria-label="Log in to your account"
-            className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs mt-2"
+            className="w-full h-11 rounded-[2px] glass-btn uppercase font-bold tracking-widest text-xs mt-2"
           >
             l<span className="italic">o</span>g in
           </button>
@@ -136,7 +136,7 @@ export default function LoginPage() {
             type="button"
             onClick={handleGoogleLogin}
             aria-label="Sign in with Google"
-            className="w-full h-11 rounded-2xl glass-btn uppercase font-bold tracking-widest text-xs"
+            className="w-full h-11 rounded-[2px] glass-btn uppercase font-bold tracking-widest text-xs"
           >
             c<span className="italic">o</span>ntinue with g<span className="italic">o</span>ogle
           </button>

@@ -148,6 +148,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const [themeBgImage, setThemeBgImage] = useState<string | null>(null);
   const [themeBlendMode, setThemeBlendMode] = useState<string>('multiply'); // default overlay blend
   const [themeBgSaturation, setThemeBgSaturation] = useState<string>('muted'); // default muted desaturated
+  const [bundleId, setBundleId] = useState<string | null>(null);
+  const [bundles, setBundles] = useState<any[]>([]);
 
   const editor = useEditor({
     extensions: [
@@ -215,6 +217,24 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
       const isGuest = localStorage.getItem('draft_guest_mode') === 'true';
 
+      // Load Bundles
+      if (isGuest) {
+        const localBundles = localStorage.getItem('draft_bundles');
+        if (localBundles) {
+          setBundles(JSON.parse(localBundles));
+        }
+      } else {
+        try {
+          const supabase = createClient();
+          const { data: bundlesData } = await supabase.from('bundles').select('*');
+          if (bundlesData) {
+            setBundles(bundlesData);
+          }
+        } catch (e) {
+          console.warn("Failed to load bundles:", e);
+        }
+      }
+
       if (isGuest) {
         const localNotes = localStorage.getItem('draft_notes');
         if (localNotes) {
@@ -224,6 +244,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             setTitle(currentNote.title || '');
             setDescription(currentNote.description || '');
             editor.commands.setContent(currentNote.content || '');
+            setBundleId(currentNote.bundleId || null);
             
             // Populate theme if present
             if (currentNote.theme_settings) {
@@ -246,6 +267,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
           setTitle(note.title || '');
           setDescription(note.description || '');
           editor.commands.setContent(note.content || '');
+          setBundleId(note.bundle_id || null);
           
           if (note.theme_settings) {
             setThemeBgColor(note.theme_settings.themeBgColor || '#FFFFFF');
@@ -285,6 +307,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                 description, 
                 content: contentHtml, 
                 theme_settings: themeSettings,
+                bundleId: bundleId || 'guest-mock-unsorted',
                 updatedAt: new Date().toISOString().split('T')[0] 
               } 
             : n
@@ -297,7 +320,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
           description,
           content: contentHtml,
           theme_settings: themeSettings,
-          bundleId: 'guest-mock-unsorted',
+          bundleId: bundleId || 'guest-mock-unsorted',
           updatedAt: new Date().toISOString().split('T')[0],
           gridSpan: 'col-span-1 row-span-1',
         }];
@@ -312,6 +335,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
           description,
           content: contentHtml,
           theme_settings: themeSettings,
+          bundle_id: bundleId,
           updated_at: new Date().toISOString(),
         })
         .eq('id', noteId);
@@ -514,7 +538,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
               placeholder="UNTITLED"
               aria-label="Note title"
               data-testid="editor-title"
-              className={`w-full text-center bg-transparent border-none outline-none text-2xl sm:text-4xl md:text-5xl font-bold uppercase tracking-wider bg-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] rounded-lg ${textColor} ${placeholderColor} min-w-0`}
+              className={`w-full text-center bg-transparent border-none outline-none text-2xl sm:text-4xl md:text-5xl font-bold uppercase tracking-wider bg-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] rounded-[2px] ${textColor} ${placeholderColor} min-w-0`}
             />
 
             {/* Description input */}
@@ -525,7 +549,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
               placeholder="ADD DESCRIPTION"
               aria-label="Note description"
               data-testid="editor-description"
-              className={`w-full text-center bg-transparent border-none outline-none text-xs sm:text-sm mt-1.5 uppercase tracking-wide focus:ring-0 focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] rounded-lg font-serif ${mutedTextColor} ${placeholderColor} min-w-0`}
+              className={`w-full text-center bg-transparent border-none outline-none text-xs sm:text-sm mt-1.5 uppercase tracking-wide focus:ring-0 focus-visible:ring-2 focus-visible:ring-[var(--color-rust)] rounded-[2px] font-serif ${mutedTextColor} ${placeholderColor} min-w-0`}
             />
           </div>
 
@@ -549,11 +573,11 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                   className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1.5px] no-print" 
                   onClick={() => setShowMenu(false)}
                 />
-                <div className={`absolute right-0 top-10 w-72 max-w-[calc(100vw-32px)] p-6 shadow-2xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 rounded-[24px] border ${
+                <div className={`absolute right-0 top-10 w-72 max-w-[calc(100vw-32px)] p-6 shadow-2xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 border-none ${
                   isDarkTheme 
-                    ? 'bg-[#18181b] border-white/10 text-white' 
-                    : 'bg-white border-black/10 text-[var(--color-ink)]'
-                }`}>
+                    ? 'text-white' 
+                    : 'text-[var(--color-ink)]'
+                } glass-panel ${isDarkTheme ? '' : 'glass-panel-light'}`}>
                   
                   {/* THEME CONFIGURATORS (FIRST) */}
                   <div className="flex flex-col space-y-4">
@@ -673,6 +697,26 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                     >
                       EXP<span className="italic">O</span>RT .JPG
                     </button>
+                    <hr className={`border ${dividerStyle}`} />
+                    <div className="flex flex-col space-y-2 select-none">
+                      <span className="font-degraded italic text-xs tracking-wider uppercase">ASSIGN TO BUNDLE</span>
+                      <select
+                        value={bundleId || ''}
+                        onChange={(e) => setBundleId(e.target.value || null)}
+                        className={`w-full p-2.5 text-xs uppercase tracking-wider bg-transparent border outline-none rounded-[2px] font-sans ${
+                          isDarkTheme 
+                            ? 'border-white/20 text-white bg-zinc-900' 
+                            : 'border-black/20 text-[var(--color-ink)] bg-white'
+                        }`}
+                      >
+                        <option value="">(UNSORTED)</option>
+                        {bundles.map((b) => (
+                          <option key={b.id} value={b.id} className={isDarkTheme ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-950'}>
+                            {b.name.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <hr className={`border ${dividerStyle}`} />
                     <button 
                       onClick={handleDelete}

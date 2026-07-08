@@ -76,6 +76,11 @@ export default function WelcomePage() {
       {/* Generative WebGL liquid waves background (panel 1) */}
       <ShaderCanvas panel={1} opacity={1.0} />
 
+      {/* Decorative flat black and rust squares with slow, subtle idle drift/rotation */}
+      <div className="absolute left-[10%] top-[20%] w-24 h-24 sm:w-32 sm:h-32 bg-[#141414] opacity-[0.03] dark:opacity-[0.07] pointer-events-none z-0 rounded-[2px] animate-drift-1" />
+      <div className="absolute right-[12%] bottom-[20%] w-20 h-20 sm:w-28 sm:h-28 bg-[#DD400A] opacity-[0.03] dark:opacity-[0.07] pointer-events-none z-0 rounded-[2px] animate-drift-2" />
+      <div className="absolute right-[15%] top-[15%] w-12 h-12 sm:w-16 sm:h-16 bg-[#141414] opacity-[0.02] dark:opacity-[0.05] pointer-events-none z-0 rounded-[2px] animate-drift-3" />
+
       {/* Hero Composition */}
       <div className="z-10 flex flex-col items-center text-center space-y-16 max-w-full">
         <div className="relative flex flex-col items-center w-[290px] sm:w-[440px] md:w-[580px]">
@@ -91,7 +96,7 @@ export default function WelcomePage() {
           <div className="w-full flex justify-between mt-[-14px] sm:mt-[-26px] md:mt-[-36px] px-1.5 font-serif not-italic text-[11px] sm:text-[15px] md:text-xl text-[var(--color-ink)]">
             {/* Left fragment: positioned left-aligned under "Dra" */}
             <span className="text-left w-[47%] leading-none whitespace-nowrap pl-1 sm:pl-0">
-              a <span className="italic">f</span>ocused centered
+              a <span className="italic">f</span>ocus centered
             </span>
             {/* Right fragment: positioned right-aligned under "ft" */}
             <span className="text-right w-[47%] leading-none whitespace-nowrap pr-2.5 sm:pr-0">
@@ -105,7 +110,7 @@ export default function WelcomePage() {
           onClick={handleLetsGo}
           aria-label="Enter Draft"
           data-testid="welcome-cta"
-          className="px-12 py-4 glass-btn text-sm md:text-base uppercase tracking-widest font-bold rounded-full"
+          className="px-12 py-4 glass-btn text-sm md:text-base uppercase tracking-widest font-bold rounded-[2px]"
         >
           l<span className="italic">e</span>t&apos;s g<span className="italic">o</span>
         </button>

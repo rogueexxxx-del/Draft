@@ -116,9 +116,10 @@ function MenuItem({
 
       animationRef.current = gsap.to(marqueeInnerRef.current, {
         x: -contentWidth,
-        duration: speed,
+        duration: speed === 15 ? 40 : speed, // Much slower default speed for calm focus
         ease: 'none',
-        repeat: -1
+        repeat: -1,
+        paused: true // Static/paused by default
       });
     };
 
@@ -136,6 +137,9 @@ function MenuItem({
     const y = clientY - rect.top;
     const edge = findClosestEdge(x, y, rect.width, rect.height);
 
+    // Play horizontal scroll loop on hover/interaction
+    animationRef.current?.play();
+
     gsap.timeline({ defaults: animationDefaults })
       .set(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)
       .set(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0)
@@ -149,13 +153,18 @@ function MenuItem({
     const y = clientY - rect.top;
     const edge = findClosestEdge(x, y, rect.width, rect.height);
 
+    // Pause horizontal scroll loop when interaction ends
+    animationRef.current?.pause();
+
     gsap.timeline({ defaults: animationDefaults })
       .to(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)
       .to(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0);
   };
 
+  const displayColor = text === 'you' ? '#DD400A' : (disabled ? 'var(--color-muted)' : textColor);
+
   const content = (
-    <span className="menu__item-link font-degraded italic" style={{ color: disabled ? 'var(--color-muted)' : textColor }}>
+    <span className="menu__item-link font-degraded italic" style={{ color: displayColor }}>
       {text}
     </span>
   );

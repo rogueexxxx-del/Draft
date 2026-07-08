@@ -118,7 +118,7 @@ export default function SignupPage() {
             aria-label="Email address"
             autoComplete="email"
             data-testid="signup-email"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input text-white border-white/20 placeholder:text-white/50 focus:border-white/40 focus:outline-none outline-none transition-all"
+            className="w-full h-11 px-4 rounded-[2px] text-center text-sm font-normal bg-[#D9D9D9] text-[#141414] border-none outline-none placeholder:text-zinc-500 transition-all focus-visible:ring-2 focus-visible:ring-[#DD400A]"
           />
           <input 
             id="signup-password"
@@ -130,7 +130,7 @@ export default function SignupPage() {
             aria-label="Password"
             autoComplete="new-password"
             data-testid="signup-password"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input text-white border-white/20 placeholder:text-white/50 focus:border-white/40 focus:outline-none outline-none transition-all"
+            className="w-full h-11 px-4 rounded-[2px] text-center text-sm font-normal bg-[#D9D9D9] text-[#141414] border-none outline-none placeholder:text-zinc-500 transition-all focus-visible:ring-2 focus-visible:ring-[#DD400A]"
           />
           <input
             id="signup-confirm-password"
@@ -142,26 +142,26 @@ export default function SignupPage() {
             aria-label="Confirm password"
             autoComplete="new-password"
             data-testid="signup-confirm-password"
-            className="w-full h-11 px-4 rounded-2xl text-center text-sm font-normal glass-input text-white border-white/20 placeholder:text-white/50 focus:border-white/40 focus:outline-none outline-none transition-all"
+            className="w-full h-11 px-4 rounded-[2px] text-center text-sm font-normal bg-[#D9D9D9] text-[#141414] border-none outline-none placeholder:text-zinc-500 transition-all focus-visible:ring-2 focus-visible:ring-[#DD400A]"
           />
           
-          {error && <div role="alert" aria-live="polite" className="text-red-200 bg-red-950/40 border border-red-900/50 px-3 py-2 text-xs text-center rounded-xl font-medium">{error}</div>}
+          {error && <div role="alert" aria-live="polite" className="text-red-200 bg-red-950/40 border border-red-900/50 px-3 py-2 text-xs text-center rounded-[2px] font-medium">{error}</div>}
           
           <button
             type="submit"
             disabled={loading}
             data-testid="signup-submit"
             aria-label="Create account"
-            className="w-full h-11 rounded-2xl glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
+            className="w-full h-11 rounded-[2px] glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
           >
-            {loading ? 'processing...' : <>s<span className="italic">i</span>gn up</>}
+            {loading ? 'processing...' : 'sign up'}
           </button>
           
           <button 
             type="button"
             onClick={handleGoogleLogin}
             aria-label="Sign up with Google"
-            className="w-full h-11 rounded-2xl glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs"
+            className="w-full h-11 rounded-[2px] glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs"
           >
             c<span className="italic">o</span>ntinue with g<span className="italic">o</span>ogle
           </button>

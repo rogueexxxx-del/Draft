@@ -273,12 +273,12 @@ export default function NotesBundlesPage() {
                       setSelectedBundleId(null);
                       setIsFilterOpen(false);
                     }}
-                    className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider ${!selectedBundleId ? 'bg-black/10 font-bold rounded-lg' : 'hover:bg-black/5 rounded-lg'}`}
+                    className={`text-left px-3 py-2 font-degraded not-italic text-sm uppercase tracking-wider ${!selectedBundleId ? 'bg-black/10 font-bold rounded-[2px]' : 'hover:bg-black/5 rounded-[2px]'}`}
                   >
                     <span className="italic">A</span>LL N<span className="italic">O</span>TES
                   </button>
                   {sortedBundles.map(b => (
-                    <div key={b.id} className={`flex items-center justify-between hover:bg-black/5 rounded-lg px-3 py-1 ${selectedBundleId === b.id ? 'bg-black/10 font-bold' : ''}`}>
+                    <div key={b.id} className={`flex items-center justify-between hover:bg-black/5 rounded-[2px] px-3 py-1 ${selectedBundleId === b.id ? 'bg-black/10 font-bold' : ''}`}>
                       <button
                         onClick={() => {
                           setSelectedBundleId(b.id);
@@ -408,7 +408,7 @@ export default function NotesBundlesPage() {
           return (
             <div
               key={note.id}
-              className={`animate-stagger-fade relative group rounded-[28px] overflow-hidden border transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass} ${cardBgClass}`}
+              className={`animate-stagger-fade relative group rounded-[2px] overflow-hidden border transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass} ${cardBgClass}`}
               style={{ animationDelay: `${index * 60}ms` }}
               aria-label={`Open note: ${note.title || 'Untitled'}`}
               data-testid={`note-card-${note.id}`}
@@ -466,7 +466,7 @@ export default function NotesBundlesPage() {
           onClick={handleAddNote}
           aria-label="Create new note"
           data-testid="add-note-button"
-          className="text-xs font-sans tracking-widest uppercase rounded-full px-5 py-2.5 font-medium glass-btn"
+          className="text-xs font-sans tracking-widest uppercase rounded-[2px] px-5 py-2.5 font-medium glass-btn"
         >
           + A<span className="italic">d</span>d N<span className="italic">o</span>te
         </button>
@@ -475,7 +475,7 @@ export default function NotesBundlesPage() {
       {/* BUNDLE CREATION MODAL */}
       {isCreateBundleOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-panel p-8 max-w-md w-full relative text-[var(--color-ink)] animate-in zoom-in-95 duration-200">
+          <div className="glass-panel p-8 max-w-md w-full relative text-[var(--color-ink)] animate-in zoom-in-95 duration-200 rounded-[2px] border-none">
             <h3 className="font-degraded italic text-2xl mb-6">Create New Bundle</h3>
             <form onSubmit={handleCreateBundle} className="flex flex-col space-y-4">
               <input 
@@ -484,18 +484,18 @@ export default function NotesBundlesPage() {
                 value={bundleName}
                 onChange={(e) => setBundleName(e.target.value)}
                 required
-                className="w-full h-[35px] px-4 rounded-full text-center text-xs font-normal glass-panel-dark text-white focus:outline-none placeholder:text-center placeholder:text-white/50 placeholder:text-xs outline-none"
+                className="w-full h-11 px-4 rounded-[2px] text-center text-xs font-normal bg-[#D9D9D9] text-[#141414] border-none outline-none placeholder:text-zinc-500 transition-all focus-visible:ring-2 focus-visible:ring-[#DD400A]"
               />
               <textarea 
                 placeholder="description (optional)"
                 value={bundleDesc}
                 onChange={(e) => setBundleDesc(e.target.value)}
-                className="w-full px-4 py-2 rounded-2xl text-center text-xs font-normal glass-panel-dark text-white focus:outline-none placeholder:text-center placeholder:text-white/50 placeholder:text-xs h-20 resize-none outline-none"
+                className="w-full px-4 py-2 rounded-[2px] text-center text-xs font-normal bg-[#D9D9D9] text-[#141414] border-none outline-none placeholder:text-zinc-500 h-20 resize-none transition-all focus-visible:ring-2 focus-visible:ring-[#DD400A]"
               />
               <div className="flex flex-col space-y-2">
                 <span className="text-xs uppercase tracking-widest opacity-80">Color Tag</span>
                 <div className="flex space-x-3">
-                  {['#DD400A', '#141414', '#D9D9D9', '#3B82F6', '#FBBF24'].map((color) => (
+                  {['#DD400A', '#141414', '#A9765A', '#1F4B4A', '#A9812E'].map((color) => (
                     <button
                       key={color}
                       type="button"
@@ -541,7 +541,7 @@ function CardMenu({ noteId, isDarkCard, onDelete }: { noteId: string; isDarkCard
           e.preventDefault();
           setOpen(!open);
         }}
-        className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-40 hover:opacity-100 ${
+        className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-[2px] hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-40 hover:opacity-100 ${
           isDarkCard ? 'text-white' : 'text-[var(--color-ink)]'
         }`}
         aria-label="Note options"
@@ -560,7 +560,7 @@ function CardMenu({ noteId, isDarkCard, onDelete }: { noteId: string; isDarkCard
               setOpen(false);
             }}
           />
-          <div className={`absolute right-0 top-8 w-36 py-1.5 shadow-xl z-50 rounded-xl border animate-in fade-in slide-in-from-top-2 duration-150 ${
+          <div className={`absolute right-0 top-8 w-36 py-1.5 shadow-xl z-50 rounded-[2px] border animate-in fade-in slide-in-from-top-2 duration-150 ${
             isDarkCard 
               ? 'bg-zinc-900 border-white/10 text-white' 
               : 'bg-white border-black/10 text-zinc-900'
