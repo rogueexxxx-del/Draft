@@ -189,35 +189,57 @@ button, input, textarea, select {
 
 /* Glassmorphism Utilities — Variant-inspired ultra-subtle glass */
 .glass-panel {
-  background: rgba(20, 20, 20, 0.45) !important; /* ink base */
-  background-image: url('/assets/grain-ink.jpg') !important;
-  background-blend-mode: overlay !important;
-  background-size: cover !important;
+  position: relative;
+  background: rgba(20, 20, 20, 0.4) !important; /* ink base, translucent */
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
   border-radius: 2px !important;
   border: none !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden;
+}
+
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/assets/grain-ink.jpg');
+  background-size: cover;
+  opacity: 0.12; /* translucent grain layer */
+  pointer-events: none;
 }
 
 .glass-panel-light {
   background: rgba(255, 255, 255, 0.45) !important; /* white base for light screens */
-  background-image: url('/assets/grain-rust.jpg') !important;
-  background-blend-mode: overlay !important;
-  background-size: cover !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
 }
 
+.glass-panel-light::before {
+  background-image: url('/assets/grain-rust.jpg') !important;
+  opacity: 0.08 !important;
+}
+
 .glass-panel-dark {
-  background: rgba(20, 20, 20, 0.65) !important;
-  background-image: url('/assets/grain-ink.jpg') !important;
-  background-blend-mode: overlay !important;
-  background-size: cover !important;
+  position: relative;
+  background: rgba(20, 20, 20, 0.6) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
   border-radius: 2px !important;
   border: none !important;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden;
+}
+
+.glass-panel-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/assets/grain-ink.jpg');
+  background-size: cover;
+  opacity: 0.15;
+  pointer-events: none;
 }
 
 .glass-panel-color {

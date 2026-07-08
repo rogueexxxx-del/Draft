@@ -118,7 +118,7 @@ export default function YouPage() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] w-full bg-transparent py-12 px-6 sm:px-12 md:px-24 flex flex-col items-center justify-between select-none font-degraded not-italic text-[var(--color-ink)]">
+    <div className="relative min-h-[100dvh] w-full bg-transparent py-12 px-6 sm:px-12 md:px-24 flex flex-col items-center justify-between select-none font-degraded not-italic text-white">
       {/* Soft Blurry Metaballs Shader Backdrop */}
       <ShaderCanvas panel={1} opacity={1.0} />
       
@@ -135,6 +135,7 @@ export default function YouPage() {
             onClick={() => {}}
             aria-label="Back to Dashboard"
             data-testid="you-back"
+            className="text-white"
           >
             <Menu size={20} />
           </IconButton>
@@ -142,18 +143,18 @@ export default function YouPage() {
       </div>
 
       {/* Centered Profile Card wrapping email and actions in glassmorphism */}
-      <div className="w-full max-w-md p-10 glass-panel flex flex-col items-center justify-center my-auto space-y-8 z-10">
+      <div className="w-full max-w-md p-10 glass-panel flex flex-col items-center justify-center my-auto space-y-8 z-10 text-white">
         {/* User Email Display */}
         <div className="flex flex-col items-center space-y-2">
-          <span className="text-sm tracking-widest text-[var(--color-muted)] uppercase">
+          <span className="text-sm tracking-widest text-zinc-400 uppercase">
             E<span className="italic">M</span>AIL
           </span>
-          <h2 className="text-sm sm:text-base md:text-xl font-serif font-normal tracking-wide text-center uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-full px-2 text-[var(--color-ink)]">
+          <h2 className="text-sm sm:text-base md:text-xl font-serif font-normal tracking-wide text-center uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-full px-2 text-white">
             {email}
           </h2>
         </div>
 
-        <div className="w-full border-t border-black/5 my-4" />
+        <div className="w-full border-t border-white/10 my-4" />
 
         {/* HIG-style Settings Table Rows */}
         <div className="flex flex-col w-full" role="list" aria-busy={syncing}>
@@ -162,23 +163,23 @@ export default function YouPage() {
             onClick={handleSync}
             disabled={syncing}
             data-testid="sync-button"
-            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-black/5 dark:hover:bg-white/5 rounded-[2px] transition-colors disabled:opacity-50 active:scale-[0.98]"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-white/5 rounded-[2px] transition-colors disabled:opacity-50 active:scale-[0.98]"
             role="listitem"
           >
             <div className="flex items-center gap-4">
-              <RefreshCw size={20} className={`text-[var(--color-ink)] ${syncing ? 'animate-spin' : ''}`} />
-              <span className="text-base font-serif not-italic tracking-wide text-[var(--color-ink)]">
+              <RefreshCw size={20} className={`text-white ${syncing ? 'animate-spin' : ''}`} />
+              <span className="text-base font-serif not-italic tracking-wide text-white">
                 {syncing ? <>S<span className="italic">y</span>nc<span className="italic">i</span>ng...</> : <>S<span className="italic">y</span>nc D<span className="italic">a</span>ta</>}
               </span>
             </div>
-            <ChevronRight size={16} className="text-[var(--color-muted)]" />
+            <ChevronRight size={16} className="text-white/40" />
           </button>
 
           {/* Delete Account Row */}
           <button
             onClick={handleDeleteAccount}
             data-testid="delete-account-button"
-            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-red-50 dark:hover:bg-red-950/20 rounded-[2px] transition-colors active:scale-[0.98]"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-red-950/20 rounded-[2px] transition-colors active:scale-[0.98]"
             role="listitem"
           >
             <div className="flex items-center gap-4">
@@ -194,16 +195,16 @@ export default function YouPage() {
           <button
             onClick={handleLogout}
             data-testid="logout-button"
-            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-black/5 dark:hover:bg-white/5 rounded-[2px] transition-colors active:scale-[0.98]"
+            className="flex items-center justify-between w-full px-4 py-4 min-h-[52px] hover:bg-white/5 rounded-[2px] transition-colors active:scale-[0.98]"
             role="listitem"
           >
             <div className="flex items-center gap-4">
-              <LogOut size={20} className="text-[var(--color-ink)]" />
-              <span className="text-base font-serif not-italic tracking-wide text-[var(--color-ink)]">
+              <LogOut size={20} className="text-white" />
+              <span className="text-base font-serif not-italic tracking-wide text-white">
                 L<span className="italic">o</span>g O<span className="italic">u</span>t
               </span>
             </div>
-            <ChevronRight size={16} className="text-[var(--color-muted)]" />
+            <ChevronRight size={16} className="text-white/40" />
           </button>
         </div>
       </div>

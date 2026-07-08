@@ -82,7 +82,7 @@ export default function LoginPage() {
       <ShaderCanvas panel={1} opacity={1.0} />
 
       {/* Auth Card wrapped in glassmorphism panel */}
-      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10">
+      <div className="w-full max-w-sm p-10 glass-panel glass-panel-light flex flex-col items-center space-y-10 z-10 text-[var(--color-ink)]">
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">

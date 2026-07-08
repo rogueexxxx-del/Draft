@@ -92,17 +92,17 @@ export default function SignupPage() {
       <ShaderCanvas panel={1} theme="rust" opacity={1.0} />
 
       {/* Auth Card wrapped in glassmorphism panel */}
-      <div className="w-full max-w-sm p-10 glass-panel flex flex-col items-center space-y-10 z-10 text-white border-white/10">
+      <div className="w-full max-w-sm p-10 glass-panel glass-panel-light flex flex-col items-center space-y-10 z-10 text-[var(--color-ink)]">
         
         {/* WORDMARK & TAGLINE */}
         <div className="text-center flex flex-col items-center space-y-1">
           <img 
             src="/draft.svg" 
             alt="Draft" 
-            className="w-40 h-auto select-none brightness-0 invert"
+            className="w-40 h-auto select-none"
             draggable="false"
           />
-          <p className="text-xs text-white/60 font-serif not-italic mt-1">
+          <p className="text-xs text-[var(--color-muted)] font-serif not-italic mt-1">
             start with one idea.
           </p>
         </div>
@@ -145,14 +145,14 @@ export default function SignupPage() {
             className="w-full h-11 px-4 rounded-[2px] text-center text-sm font-normal bg-[#D9D9D9] text-[#141414] border-none outline-none placeholder:text-zinc-500 transition-all focus-visible:ring-2 focus-visible:ring-[#DD400A]"
           />
           
-          {error && <div role="alert" aria-live="polite" className="text-red-200 bg-red-950/40 border border-red-900/50 px-3 py-2 text-xs text-center rounded-[2px] font-medium">{error}</div>}
+          {error && <div role="alert" aria-live="polite" className="text-red-600 bg-red-50 border border-red-100 px-3 py-2 text-xs text-center rounded-[2px] font-medium">{error}</div>}
           
           <button
             type="submit"
             disabled={loading}
             data-testid="signup-submit"
             aria-label="Create account"
-            className="w-full h-11 rounded-[2px] glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
+            className="w-full h-11 rounded-[2px] glass-btn uppercase font-bold tracking-widest text-xs mt-2 disabled:opacity-50"
           >
             {loading ? 'processing...' : 'sign up'}
           </button>
@@ -161,23 +161,23 @@ export default function SignupPage() {
             type="button"
             onClick={handleGoogleLogin}
             aria-label="Sign up with Google"
-            className="w-full h-11 rounded-[2px] glass-btn text-white border-white/20 hover:bg-white/10 uppercase font-bold tracking-widest text-xs"
+            className="w-full h-11 rounded-[2px] glass-btn uppercase font-bold tracking-widest text-xs"
           >
             c<span className="italic">o</span>ntinue with g<span className="italic">o</span>ogle
           </button>
         </form>
 
-        <div className="w-full border-t border-white/10" />
+        <div className="w-full border-t border-black/5" />
 
         {/* SECONDARY ACTIONS */}
-        <div className="flex flex-col items-center space-y-3 text-xs text-white/80 w-full">
+        <div className="flex flex-col items-center space-y-3 text-xs text-[var(--color-ink)] w-full">
           <div>
-            already in? — <Link href="/login" className="underline hover:text-white transition-colors font-bold text-white">log in</Link>
+            already in? — <Link href="/login" className="underline hover:opacity-75 transition-opacity font-bold">log in</Link>
           </div>
           <button
             type="button"
             onClick={handleGuestMode}
-            className="underline hover:text-white transition-colors bg-transparent border-none p-0 cursor-pointer font-medium text-xs text-white/80"
+            className="underline hover:opacity-75 transition-opacity bg-transparent border-none p-0 cursor-pointer font-medium text-xs"
           >
             try it without an account
           </button>

@@ -573,7 +573,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                   className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1.5px] no-print" 
                   onClick={() => setShowMenu(false)}
                 />
-                <div className={`absolute right-0 top-10 w-72 max-w-[calc(100vw-32px)] p-6 shadow-2xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 border-none ${
+                <div className={`absolute right-0 top-full mt-1 w-72 max-w-[calc(100vw-32px)] p-6 shadow-2xl z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-150 border-none ${
                   isDarkTheme 
                     ? 'text-white' 
                     : 'text-[var(--color-ink)]'

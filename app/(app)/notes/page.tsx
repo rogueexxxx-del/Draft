@@ -266,7 +266,7 @@ export default function NotesBundlesPage() {
                 className="fixed inset-0 z-40 bg-transparent"
                 onClick={() => setIsFilterOpen(false)}
               />
-              <div className="absolute left-0 top-11 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+              <div className="absolute left-0 top-full mt-1 w-64 glass-panel glass-panel-light p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50 text-[var(--color-ink)]">
                 <div className="flex flex-col space-y-2 max-h-60 overflow-y-auto">
                   <button
                     onClick={() => {
@@ -322,7 +322,7 @@ export default function NotesBundlesPage() {
                 className="fixed inset-0 z-40 bg-transparent"
                 onClick={() => setIsMenuOpen(false)}
               />
-              <div className="absolute right-0 top-11 w-64 glass-panel p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50">
+              <div className="absolute right-0 top-full mt-1 w-64 glass-panel glass-panel-light p-5 animate-in fade-in slide-in-from-top-4 duration-200 z-50 text-[var(--color-ink)]">
                 <div className="flex flex-col space-y-4">
                   <Link
                     href="/dashboard"
@@ -372,14 +372,10 @@ export default function NotesBundlesPage() {
           const bundle = bundles.find(b => b.id === note.bundleId);
           const blockColor = bundle?.color || '#D9D9D9';
           
-          const isDarkCard = blockColor === '#141414';
-          const cardBgClass = isDarkCard 
-            ? 'bg-[#18181b]/95 border-white/5 shadow-2xl text-white' 
-            : 'bg-white/95 border-black/5 shadow-lg text-[var(--color-ink)]';
-
-          const isDarkBg = blockColor === '#141414' || blockColor === '#DD400A';
-          const textColor = isDarkBg ? 'text-white' : 'text-[var(--color-ink)]';
-          const descColor = isDarkBg ? 'text-white/70' : 'text-[var(--color-muted)]';
+          const isDarkColor = ['#141414', '#DD400A', '#1F4B4A', '#A9765A'].includes(blockColor);
+          const cardTextColor = isDarkColor ? 'text-white' : 'text-[var(--color-ink)]';
+          const cardBorderColor = isDarkColor ? 'border-white/10' : 'border-black/10';
+          const cardDescColor = isDarkColor ? 'text-white/70' : 'text-[var(--color-muted)]';
 
           const cleanTextPreview = note.content
             ? note.content.replace(/<[^>]*>/g, ' ').substring(0, 120)
@@ -408,11 +404,22 @@ export default function NotesBundlesPage() {
           return (
             <div
               key={note.id}
-              className={`animate-stagger-fade relative group rounded-[2px] overflow-hidden border transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass} ${cardBgClass}`}
-              style={{ animationDelay: `${index * 60}ms` }}
+              className={`animate-stagger-fade relative group rounded-[2px] overflow-hidden border transition-all duration-300 hover:translate-y-[-3px] ${getResponsiveSpan(note.gridSpan)} ${heightClass} ${cardTextColor} ${cardBorderColor}`}
+              style={{ 
+                animationDelay: `${index * 60}ms`,
+                backgroundColor: blockColor 
+              }}
               aria-label={`Open note: ${note.title || 'Untitled'}`}
               data-testid={`note-card-${note.id}`}
             >
+              {/* Tiling photographic grain overlay inside the card */}
+              <div 
+                className="absolute inset-0 z-0 pointer-events-none opacity-[0.06] mix-blend-overlay bg-cover bg-center"
+                style={{ 
+                  backgroundImage: `url(${isDarkColor ? '/assets/grain-ink.jpg' : '/assets/grain-rust.jpg'})`
+                }}
+              />
+
               {/* Card content linking to editor */}
               <Link
                 href={`/notes/editor/${note.id}`}
@@ -429,21 +436,21 @@ export default function NotesBundlesPage() {
                 
                 {/* Top Info */}
                 <div className="flex justify-between items-start z-10 w-full pr-8">
-                  <span className={`text-[10px] font-sans font-semibold tracking-widest uppercase opacity-60 ${isDarkCard ? 'text-white' : 'text-[var(--color-ink)]'}`}>
+                  <span className={`text-[10px] font-sans font-semibold tracking-widest uppercase opacity-60 ${cardTextColor}`}>
                     {bundle?.name || 'unsorted'}
                   </span>
                   <span 
-                    className="w-2.5 h-2.5 rounded-full shrink-0" 
+                    className="w-2.5 h-2.5 rounded-full shrink-0 border border-current/25" 
                     style={{ backgroundColor: blockColor }} 
                   />
                 </div>
 
                 {/* Bottom Title & Content */}
                 <div className="mt-8 flex-grow flex flex-col justify-end z-10 w-full">
-                  <h3 className={`text-xl md:text-2xl font-serif font-semibold tracking-wide leading-snug line-clamp-2 ${isDarkCard ? 'text-white' : 'text-[var(--color-ink)]'}`}>
+                  <h3 className={`text-xl md:text-2xl font-serif font-semibold tracking-wide leading-snug line-clamp-2 ${cardTextColor}`}>
                     {note.title || 'UNTITLED'}
                   </h3>
-                  <p className={`text-xs md:text-sm mt-3 line-clamp-3 font-serif opacity-75 leading-relaxed ${isDarkCard ? 'text-white/80' : 'text-[var(--color-muted)]'}`}>
+                  <p className={`text-xs md:text-sm mt-3 line-clamp-3 font-serif leading-relaxed ${cardDescColor}`}>
                     {cleanTextPreview}
                   </p>
                 </div>
@@ -452,7 +459,7 @@ export default function NotesBundlesPage() {
               {/* Note options menu (delete button) */}
               <CardMenu 
                 noteId={note.id} 
-                isDarkCard={isDarkCard} 
+                isDarkCard={isDarkColor} 
                 onDelete={() => handleDeleteNoteDirectly(note.id)} 
               />
             </div>
