@@ -20,7 +20,10 @@ To translate the design system into a production-ready Web App, the Figma design
 ## 💎 Key Features
 
 *   **Distraction-Free Canvas**: Tiptap-powered rich text editor featuring inline slash commands (`/` triggers list) for headings, lists, highlights, and local base64 image uploads.
-*   **Bento Grid Organization**: An interactive, responsive dashboard bento grid mapping notes and bundles.
+*   **Bento Grid Organization**: An interactive, responsive notes grid mapping notes and bundles.
+*   **Scrapbook**: Save visual references and short notes in a flexible card gallery.
+*   **Shot List**: Plan scenes with framing, movement, and capture progress.
+*   **Script**: Write screenplays in a focused editor, then print or export Fountain text.
 *   **Adaptive Theme Overlays**: Customize note backgrounds with uploaded images, solid colors, and generative WebGL backdrops. Set blend modes (`multiply`, `overlay`, `normal`) and saturation filters (`color`, `muted`, `B&W`) directly inside the canvas.
 *   **High-Fidelity Exports**: 
     *   **Export .JPG**: Custom canvas captures inlining stylesheets and embedding local font faces.
@@ -56,3 +59,5 @@ To translate the design system into a production-ready Web App, the Figma design
    ```bash
    npm run build
    ```
+
+4. **Set up Supabase** (for account data): Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local`. Run `supabase_schema.sql`, then `supabase_creative_items.sql`, in the project's Supabase SQL editor. Without these credentials, Draft uses local guest storage.

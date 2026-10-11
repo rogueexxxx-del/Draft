@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import ShaderCanvas from '@/components/ShaderCanvas';
 import IconButton from '@/components/ui/IconButton';
+import { syncGuestCreativeItems } from '@/lib/creative';
 import { Menu, RefreshCw, Trash2, LogOut, ChevronRight } from 'lucide-react';
 
 export default function YouPage() {
@@ -21,7 +22,7 @@ export default function YouPage() {
       let localEmail = '';
       try {
         localEmail = localStorage.getItem('draft_user_email') || '';
-      } catch (e) {}
+      } catch {}
 
       if (user) {
         if (user.id === 'guest-mock' && localEmail) {
@@ -43,7 +44,7 @@ export default function YouPage() {
     try {
       localStorage.removeItem("draft_guest_mode");
       localStorage.removeItem("draft_user_email");
-    } catch (e) {}
+    } catch {}
     router.push('/login');
   };
 
@@ -58,7 +59,7 @@ export default function YouPage() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
-    if (!user || user.id === 'guest-mock') {
+    if (!user || user.id === 'guest-mock' || user.is_anonymous) {
       alert('PLEASE LOG IN TO SYNC YOUR DATA.');
       return;
     }
@@ -73,13 +74,14 @@ export default function YouPage() {
           // Replace 'guest-mock' suffix with the real user id
           const cleanId = bundle.id.replace('guest-mock-', `${user.id}-`);
           
-          await supabase.from('bundles').upsert({
+          const { error } = await supabase.from('bundles').upsert({
             id: cleanId,
             name: bundle.name,
             description: bundle.description || '',
             color: bundle.color || '#DD400A',
             user_id: user.id
           });
+          if (error) throw error;
         }
       }
 
@@ -89,9 +91,9 @@ export default function YouPage() {
         const localNotes = JSON.parse(localNotesStr);
         for (const note of localNotes) {
           // Replace guest-mock suffix in bundleId
-          const cleanBundleId = note.bundleId.replace('guest-mock-', `${user.id}-`);
+          const cleanBundleId = note.bundleId?.replace('guest-mock-', `${user.id}-`) || null;
           
-          await supabase.from('notes').upsert({
+          const { error } = await supabase.from('notes').upsert({
             id: note.id,
             title: note.title || 'Untitled',
             content: note.content || '',
@@ -101,17 +103,21 @@ export default function YouPage() {
             theme_settings: note.theme_settings || {},
             user_id: user.id
           });
+          if (error) throw error;
         }
       }
+
+      // Include scrapbook pieces, planned shots, and scripts in guest sync.
+      await syncGuestCreativeItems(user.id);
 
       // Clear local storage and cookies so the user doesn't double sync or stay in guest mode
       localStorage.removeItem('draft_notes');
       localStorage.removeItem('draft_bundles');
       
       alert('SYNC COMPLETED SUCCESSFULLY! ALL LOCAL DATA HAS BEEN SECURELY SAVED TO THE DATABASE.');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Sync failed:', err);
-      alert(`SYNC FAILED: ${err.message}`);
+      alert(`SYNC FAILED: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setSyncing(false);
     }

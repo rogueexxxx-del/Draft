@@ -1,5 +1,5 @@
 // Distraction-free custom service worker for Draft PWA
-const CACHE_NAME = 'draft-v1';
+const CACHE_NAME = 'draft-v2';
 const ASSETS = [
   '/',
   '/manifest.json',
@@ -38,6 +38,25 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Let the browser handle standard non-GET requests (e.g. Supabase POST/PATCH)
   if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Pages and Next navigation payloads must pick up the current build.
+  if (event.request.mode === 'navigate' || url.searchParams.has('_rsc')) {
+    event.respondWith(
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse.status === 200) {
+          const cacheCopy = networkResponse.clone();
+          event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cacheCopy)));
+        }
+        return networkResponse;
+      }).catch(async () => {
+        return await caches.match(event.request) || new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

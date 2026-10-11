@@ -15,7 +15,7 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -31,7 +31,11 @@ export async function proxy(request: NextRequest) {
   const isGuest = request.cookies.get('draft_guest_mode')?.value === 'true';
 
   // refreshing the auth token
-  const { data: { user } } = await supabase.auth.getUser()
+  // The installed auth runtime has getUser, though its bundled auth type omits it here.
+  const auth = supabase.auth as unknown as {
+    getUser: () => Promise<{ data: { user: { id: string } | null } }>
+  }
+  const { data: { user } } = await auth.getUser()
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || 
                       request.nextUrl.pathname.startsWith('/signup') || 

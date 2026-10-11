@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
@@ -8,6 +8,7 @@ import { Star, MoreHorizontal, Filter, Menu } from 'lucide-react';
 import ShaderCanvas from '@/components/ShaderCanvas';
 import IconButton from '@/components/ui/IconButton';
 import SkeletonCard from '@/components/ui/SkeletonCard';
+import type { SupabaseNote } from '@/lib/api';
 
 interface Bundle {
   id: string;
@@ -44,22 +45,6 @@ export default function NotesBundlesPage() {
   const [starredBundles, setStarredBundles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const gridRef = useRef<HTMLDivElement>(null);
-
-  const hexToRgba = (hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16) || 255;
-    const g = parseInt(hex.slice(3, 5), 16) || 255;
-    const b = parseInt(hex.slice(5, 7), 16) || 255;
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
-
-  const hexToRgbString = (hex: string) => {
-    const r = parseInt(hex.slice(1, 3), 16) || 255;
-    const g = parseInt(hex.slice(3, 5), 16) || 255;
-    const b = parseInt(hex.slice(5, 7), 16) || 255;
-    return `${r}, ${g}, ${b}`;
-  };
-
   // Initialize data on mount
   useEffect(() => {
     const loadData = async () => {
@@ -84,8 +69,6 @@ export default function NotesBundlesPage() {
         { id: `${activeUserId}-journal`, name: 'Journal', description: 'daily thoughts', color: '#141414' },
       ];
 
-      const defaultNotes: Note[] = [];
-
       if (isGuest) {
         const localBundles = localStorage.getItem('draft_bundles');
         const localNotes = localStorage.getItem('draft_notes');
@@ -106,7 +89,7 @@ export default function NotesBundlesPage() {
       } else {
         const supabase = createClient();
         
-        let { data: bundlesData } = await supabase.from('bundles').select('*');
+        const { data: bundlesData } = await supabase.from('bundles').select('*');
         if (!bundlesData || bundlesData.length === 0) {
           await supabase.from('bundles').insert(defaultBundles);
           setBundles(defaultBundles);
@@ -114,11 +97,11 @@ export default function NotesBundlesPage() {
           setBundles(bundlesData);
         }
 
-        let { data: notesData } = await supabase.from('notes').select('*');
+        const { data: notesData } = await supabase.from('notes').select('*');
         if (!notesData || notesData.length === 0) {
           setNotes([]);
         } else {
-          const mappedNotes = notesData.map((n: any) => ({
+          const mappedNotes = notesData.map((n: SupabaseNote) => ({
             id: n.id,
             title: n.title,
             content: n.content,
@@ -210,8 +193,8 @@ export default function NotesBundlesPage() {
     if (isGuest) {
       const localNotes = localStorage.getItem('draft_notes');
       if (localNotes) {
-        const notesList = JSON.parse(localNotes);
-        const updated = notesList.filter((n: any) => n.id !== id);
+        const notesList: Note[] = JSON.parse(localNotes);
+        const updated = notesList.filter(n => n.id !== id);
         setNotes(updated);
         localStorage.setItem('draft_notes', JSON.stringify(updated));
       }
@@ -219,6 +202,48 @@ export default function NotesBundlesPage() {
       const supabase = createClient();
       await supabase.from('notes').delete().eq('id', id);
       setNotes(notes.filter(n => n.id !== id));
+    }
+  };
+
+  const handleExportAllNotes = async () => {
+    setIsMenuOpen(false);
+    try {
+      let exportedNotes: unknown[];
+      let exportedBundles: unknown[];
+
+      if (localStorage.getItem('draft_guest_mode') === 'true') {
+        exportedNotes = JSON.parse(localStorage.getItem('draft_notes') || '[]');
+        exportedBundles = JSON.parse(localStorage.getItem('draft_bundles') || '[]');
+      } else {
+        const supabase = createClient();
+        const fetchAll = async (table: 'notes' | 'bundles') => {
+          const rows: unknown[] = [];
+          for (let start = 0; ; start += 1000) {
+            const { data, error } = await supabase.from(table).select('*').range(start, start + 999);
+            if (error) throw error;
+            rows.push(...(data || []));
+            if (!data || data.length < 1000) break;
+          }
+          return rows;
+        };
+        [exportedNotes, exportedBundles] = await Promise.all([fetchAll('notes'), fetchAll('bundles')]);
+      }
+
+      const blob = new Blob([JSON.stringify({
+        format: 'draft-notes-v1',
+        exported_at: new Date().toISOString(),
+        bundles: exportedBundles,
+        notes: exportedNotes,
+      }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `draft-notes-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      console.error('Failed to export notes:', error);
+      alert('Could not export notes. Please try again.');
     }
   };
 
@@ -341,7 +366,7 @@ export default function NotesBundlesPage() {
                     CRE<span className="italic">A</span>TE NEW B<span className="italic">U</span>NDLE
                   </button>
                   <button
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleExportAllNotes}
                     className="w-full text-left font-degraded not-italic text-sm tracking-wider hover:opacity-75 block"
                   >
                     EXP<span className="italic">O</span>RT <span className="italic">A</span>LL N<span className="italic">O</span>TES
@@ -364,7 +389,7 @@ export default function NotesBundlesPage() {
         {!loading && filteredNotes.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-24 text-center">
             <p className="text-lg font-serif opacity-40">No notes yet</p>
-            <p className="text-sm text-[var(--color-muted)] mt-2 opacity-60">Tap "+ Add Note" below to create your first note</p>
+            <p className="text-sm text-[var(--color-muted)] mt-2 opacity-60">Tap &quot;+ Add Note&quot; below to create your first note</p>
           </div>
         )}
 
@@ -383,7 +408,7 @@ export default function NotesBundlesPage() {
 
           const getResponsiveSpan = (span?: string) => {
             if (!span) return 'col-span-1';
-            let classes = [];
+            const classes = [];
             if (span.includes('col-span-2')) {
               classes.push('sm:col-span-2 col-span-1');
             } else {
